@@ -1,0 +1,27 @@
+
+body {
+    background-color: #9a989a;
+    font-family: 'Open Sans', sans-serif;  
+}
+
+#notice_wrapper {
+    position: fixed;
+    width: 100%;
+    height: 100px;
+    z-index: 999;
+    background: rgba(163, 38, 56, 0.75);
+    margin: auto;
+    padding: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+#notice_wrapper .notice {
+        padding: 2.5rem 0;
+        text-align: center;
+        margin: 0;
+        font-size: 1.25rem;
+        color: #FFFFFF;
+        letter-spacing: 1px;
+    }

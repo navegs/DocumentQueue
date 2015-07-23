@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% block head %}
+            <link rel="stylesheet" href="css/stylesheet.css" />
+            <title>DocManager | {% block title %}{% endblock %}</title>
+        {% endblock %}
+        <script src="js/jquery-2.1.4.min.js"></script>
+    </head>
+    <body>
+        <header id="header" class="">
+            <img src="images/Stevens-Logo-Preview.png" alt="Stevens Logo" />
+        </header>
+        {% include 'templates/partials/messages.html.twig' %}
+        <nav>{% include 'templates/partials/nav.html.twig' %}</nav>
+        <div id="content">{% block content %}{% endblock %}</div>
+        <div id="footer">
+            {% block footer %}
+               Brought to you by Scott Nave, CS546 2015 Summer
+            {% endblock %}
+        </div>
+    <script>
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('#notice_wrapper').fadeOut('slow', function () {
+                    $(this).remove();
+                })
+            }, 4500);
+        });
+    </script>
+    </body>
+</html>
