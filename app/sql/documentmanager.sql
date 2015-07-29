@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS `courses`;
 CREATE TABLE IF NOT EXISTS `courses` (
   `id_course` int(10) unsigned NOT NULL,
   `name` varchar(40) NOT NULL,
-  `descrip` varchar(200) NOT NULL,
+  `description` varchar(200) NOT NULL,
   `id_added_by` int(10) unsigned NOT NULL,
   `id_coordinator` int(10) unsigned NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
