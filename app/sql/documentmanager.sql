@@ -11,10 +11,10 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 --
--- Database: `approvalsqueue`
+-- Database: `document_manager`
 --
-CREATE DATABASE IF NOT EXISTS `approvalsqueue` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `approvalsqueue`;
+CREATE DATABASE IF NOT EXISTS `document_manager` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `document_manager`;
 
 -- --------------------------------------------------------
 
