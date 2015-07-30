@@ -15,6 +15,10 @@ $app->post('/register', function () use ($app) {
     $password = $request->post('password');
     $passwordConfirm = $request->post('password_confirm');
 
+    /*
+    TODO: Form Validation & Check for duplicate email
+     */
+
     $app->user->create([
         'email' => $email,
         'first_name' => $firstname,

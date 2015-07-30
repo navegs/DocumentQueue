@@ -22,4 +22,20 @@ class User extends Eloquent
     protected $guarded = [
         'id_user'
     ];
+
+    public function roles()
+    {
+        return $this->belongsToMany('DocManager\Role\Role', 'user_roles', 'id_user', 'id_role');
+    }
+
+    public function hasRole($roleName)
+    {
+        foreach ($this->roles as $role) {
+            if (strcasecmp($role['name'], $roleName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

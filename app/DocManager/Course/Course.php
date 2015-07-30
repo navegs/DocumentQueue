@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 class Course extends Eloquent
 {
     protected $table = 'courses';
+    protected $primaryKey = "id_course";
     public $timestamps = false;
 
     protected $fillable = [
@@ -14,5 +15,9 @@ class Course extends Eloquent
         'description',
         'id_added_by',
         'id_coordinator'
+    ];
+
+    protected $guarded = [
+        'id_course'
     ];
 }

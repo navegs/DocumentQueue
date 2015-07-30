@@ -4,7 +4,9 @@
         <li><a href="{{ urlFor('logout') }}">Log out</a></li>
         <li><a href="{{ urlFor('course') }}">Course Listing</a></li>
         <li><a href="{{ urlFor('advisor') }}">Advisor Listing</a></li>
+        {% if auth.hasRole('ADMIN') %}
         <li><a href="{{ urlFor('admin') }}">Administration</a></li>
+        {% endif %}
     {% else %}
         <li><a href="{{ urlFor('register') }}">Register</a></li>
         <li><a href="{{ urlFor('login') }}">Login</a></li>
