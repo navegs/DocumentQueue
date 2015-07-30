@@ -3,5 +3,19 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    Home
+    <h1>
+        Welcome to the Steven's Document Workflow Management application.        
+    </h1>
+    <p>
+        You must <a href="{{ urlFor('register') }}">register</a> before submitting documents for review.
+    </p>
+    <p>
+        This web application allows students to submit course-related documentation for review and approval by faculty (instructors or advisors). Example scenarios requiring review include:
+    </p>
+        <ul>
+            <li>Transfer Credit Approval</li>
+            <li>Study Plan Approval</li>
+            <li>Course Prerequisite Waiver</li>
+        </ul>
+    <p>Students can search for available document queues by course or advisor.</p>
 {% endblock %}

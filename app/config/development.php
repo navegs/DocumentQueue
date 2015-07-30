@@ -11,7 +11,7 @@ return [
     'db' => [
         'driver' => 'mysql',
         'host' => '127.0.0.1',
-        'name' => 'doc_manager',
+        'name' => 'document_manager',
         'username' => 'cs546',
         'password' => 'cs546',
         'charset' => 'utf8',

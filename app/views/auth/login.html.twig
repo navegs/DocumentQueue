@@ -1,0 +1,19 @@
+{% extends 'templates/base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <form action="{{ urlFor('login.post') }}" method="post" autocomplete="off">
+        <div>
+            <label for="email">Email</label>
+            <input type="text" name="email" id="email">
+        </div>
+        <div>
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password">
+        </div>
+        <div>
+            <input type="submit" name="" value="Login">
+        </div>
+    </form>
+{% endblock %}

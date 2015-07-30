@@ -1,4 +1,12 @@
 <ul>
     <li><a href="{{ urlFor('home') }}">Home</a></li>
-    <li><a href="{{ urlFor('register') }}">Register</a></li>
+    {% if auth %}
+        <li><a href="{{ urlFor('logout') }}">Log out</a></li>
+        <li><a href="{{ urlFor('course') }}">Course Listing</a></li>
+        <li><a href="{{ urlFor('advisor') }}">Advisor Listing</a></li>
+        <li><a href="{{ urlFor('admin') }}">Administration</a></li>
+    {% else %}
+        <li><a href="{{ urlFor('register') }}">Register</a></li>
+        <li><a href="{{ urlFor('login') }}">Login</a></li>
+    {% endif %}
 </ul>

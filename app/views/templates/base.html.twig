@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
     <head>
+        <meta charset="utf-8">
         {% block head %}
-            <link rel="stylesheet" href="css/stylesheet.css" />
-            <title>DocManager | {% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="css/stylesheet.css" />
+        <title>DocManager | {% block title %}{% endblock %}</title>
         {% endblock %}
         <script src="js/jquery-2.1.4.min.js"></script>
     </head>
@@ -16,7 +17,7 @@
         <div id="content">{% block content %}{% endblock %}</div>
         <div id="footer">
             {% block footer %}
-               Brought to you by Scott Nave, CS546 2015 Summer
+                Brought to you by Scott Nave & Adam Taranov, CS546 2015 Summer
             {% endblock %}
         </div>
     <script>

@@ -10,6 +10,7 @@
 
 use DocManager\Helpers\Hash;
 use DocManager\User\User;
+use DocManager\Middleware\BeforeMiddleware;
 use Noodlehaus\Config;
 use Slim\Slim;
 use Slim\Views\Twig;
@@ -30,12 +31,16 @@ $app = new Slim([
     'templates.path' => INC_ROOT . '/app/views'
 ]);
 
+$app->add(new DocManager\Middleware\BeforeMiddleware);
+
 $app->configureMode($app->config('mode'), function () use ($app) {
     $app->config = Config::load(INC_ROOT . "/app/config/{$app->mode}.php");
 });
 
 require 'database.php';
 require 'routes.php';
+
+$app->auth = false;
 
 $app->container->set('user', function () {
     return new User;
@@ -54,7 +59,3 @@ $view->parserOptions = [
 $view->parserExtensions = [
     new TwigExtension
 ];
-
-$password = 'test';
-$hash = '$2y$10$lZC2lKsp1Hj1ZPyqNF6jteK.T3J34J5BjzlpQPZudvA49k7SI2oMK';
-
