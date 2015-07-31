@@ -43,13 +43,12 @@ $app->configureMode($app->config('mode'), function () use ($app) {
 });
 
 require 'database.php';
-require 'DocManager/Middleware/RouteAuthenticationFilter.php';
+require 'DocManager/Middleware/RouteAuthorizationFilter.php';
 require 'routes.php';
 
 // Set default value for auth in Slim container
 // Used for for authentication
 $app->auth = false;
-$app->roles = false;
 
 // Make the custom User class available within the Slim container
 // Used for authentication
@@ -63,6 +62,7 @@ $app->container->singleton('hash', function () use ($app) {
     return new Hash($app->config);
 });
 
+// Setup our views for Slim
 $view = $app->view();
 
 // Set Twigs debug mode based on the value set in the configuration file

@@ -1,6 +1,16 @@
 <?php
 
-$authenticationCheck = function ($rolesArray) use ($app) {
+
+/**
+ * Anonymous Function assigned to authorizationCheck variable
+ * This function is used in routes to determine if the current user has the
+ * required roles to access the route. If not, the user is redirected to the
+ * 'home' route
+ *
+ * @param (Array) $rolesArray: An array of strings that contain the role names
+ *                             that are allowed for this route
+ */
+$authorizationCheck = function ($rolesArray) use ($app) {
     return function () use ($rolesArray, $app) {
         // Retrieve the currently authenticated users roles as an array
         $userRoles = array_column($app->auth->roles->toArray(), 'name');
