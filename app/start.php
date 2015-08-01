@@ -43,7 +43,7 @@ $app->configureMode($app->config('mode'), function () use ($app) {
 });
 
 require 'database.php';
-require 'DocManager/Middleware/RouteAuthorizationFilter.php';
+require 'DocManager/Middleware/RouteSecurityFilter.php';
 require 'routes.php';
 
 // Set default value for auth in Slim container

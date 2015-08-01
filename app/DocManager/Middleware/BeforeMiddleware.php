@@ -16,11 +16,12 @@ class BeforeMiddleware extends Middleware
     public function run()
     {
         if (isset($_SESSION[$this->app->config->get('auth.session')])) {
-            $this->app->auth = $this->app->user->where('id_user', $_SESSION[$this->app->config->get('auth.session')])->first();
+            $this->app->auth = $this->app->user->where('id_user', $_SESSION[$this->app->config->get('auth.session')])->first()->load('advisor');
         }
 
         $this->app->view()->appendData([
-            'auth' => $this->app->auth
+            'auth' => $this->app->auth,
+            'baseUrl' => $this->app->config->get('app.url')
         ]);
     }
 }

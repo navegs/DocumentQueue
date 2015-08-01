@@ -2,7 +2,8 @@
 
 return [
     'app' => [
-        'url' => 'http://192.168.1.195',
+        // Full URL where the project's public folder is deployed
+        'url' => 'http://192.168.1.195/cs546/project/public',
         'hash' => [
             'algo' => PASSWORD_BCRYPT,
             'cost' => 10

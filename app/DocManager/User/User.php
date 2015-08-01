@@ -38,4 +38,9 @@ class User extends Eloquent
 
         return false;
     }
+
+    public function advisor()
+    {
+        return $this->hasOne('DocManager\User\User', 'id_user', 'id_advisor');
+    }
 }

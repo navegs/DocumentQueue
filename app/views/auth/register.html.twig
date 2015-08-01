@@ -20,6 +20,14 @@
             <label for="major">Major</label>
             <input type="text" name="major" id="major">
         </div>
+         <div>
+            <label for="advisor">Advisor</label>
+            <select name='advisor' id='advisor'>
+                {% for user in advisors %} 
+                <option value="{{ user.id_user }}">{{ user.last_name }}, {{ user.first_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
         <div>
             <label for="password">Password</label>
             <input type="password" name="password" id="password">

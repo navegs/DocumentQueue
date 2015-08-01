@@ -10,3 +10,7 @@
 $app->get('/admin', $authorizationCheck(['ADMIN']), function () use ($app) {
     $app->render('admin/admin.html.twig');
 })->name('admin');
+
+$app->get('/admin/user', $authorizationCheck(['ADMIN']), function () use ($app) {
+    $app->render('admin/admin.user.html.twig');
+})->name('userMgmt');

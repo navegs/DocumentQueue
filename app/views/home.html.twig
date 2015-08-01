@@ -6,9 +6,11 @@
     <h1>
         Welcome to the Steven's Document Workflow Management application.        
     </h1>
+    {% if not auth %}
     <p>
         You must <a href="{{ urlFor('register') }}">register</a> before submitting documents for review.
     </p>
+    {% endif %}
     <p>
         This web application allows students to submit course-related documentation for review and approval by faculty (instructors or advisors). Example scenarios requiring review include:
     </p>
