@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 29, 2015 at 11:08 AM
+-- Generation Time: Aug 01, 2015 at 01:48 PM
 -- Server version: 5.5.28-log
 -- PHP Version: 5.6.10
 
@@ -29,7 +29,15 @@ CREATE TABLE IF NOT EXISTS `courses` (
   `description` varchar(200) NOT NULL,
   `id_added_by` int(10) unsigned NOT NULL,
   `id_coordinator` int(10) unsigned NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `courses`
+--
+
+INSERT INTO `courses` (`id_course`, `name`, `description`, `id_added_by`, `id_coordinator`) VALUES
+(1, 'Course 1', 'Proin aliquet magna eget justo facilisis, in egestas libero iaculis. In rhoncus non ante quis tincidunt. Pellentesque magna ex, fringilla finibus lectus consectetur, euismod rutrum velit', 1, 3),
+(2, 'Course 2', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
 
 -- --------------------------------------------------------
 
@@ -73,7 +81,16 @@ DROP TABLE IF EXISTS `roles`;
 CREATE TABLE IF NOT EXISTS `roles` (
   `id_role` int(10) unsigned NOT NULL,
   `name` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id_role`, `name`) VALUES
+(1, 'ADMIN'),
+(2, 'ADVISOR'),
+(3, 'INSTRUCTOR');
 
 -- --------------------------------------------------------
 
@@ -125,7 +142,17 @@ CREATE TABLE IF NOT EXISTS `users` (
   `major` varchar(100) NOT NULL,
   `password` varchar(200) NOT NULL,
   `id_advisor` int(10) unsigned NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id_user`, `first_name`, `last_name`, `email`, `major`, `password`, `id_advisor`) VALUES
+(1, 'Steven', 'Admin', 'admin@stevens.edu', 'Everything', '$2y$10$nUP1PoLDK9PlykwCLpjJXe3OoTbtgFIxZda3W6rIn9BBiVkE0iyXW', 0),
+(2, 'Steven', 'Advisor', 'advisor@stevens.edu', 'Advising', '$2y$10$ifdjyxR1p47U.unYP/QEJOI6y77U/aqpdXj5uzObQFfuCBWLUq.Ae', 0),
+(3, 'Steven', 'Instructor', 'instructor@stevens.edu', 'Instructing', '$2y$10$BUFpslEqI7nAJzQ6AAyZd.QQzE/X0CCB85zyTT8x21jMJLHSHuiZO', 0),
+(4, 'Steven', 'Student', 'student@stevens.edu', 'Studying', '$2y$10$v8lu2g8s5rXR10jWSFv50eEBiMzM4L2dzKmiFwVbWbMucrB7Nx1AS', 2);
 
 -- --------------------------------------------------------
 
@@ -138,6 +165,17 @@ CREATE TABLE IF NOT EXISTS `user_roles` (
   `id_user` int(10) unsigned NOT NULL,
   `id_role` int(10) unsigned NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `user_roles`
+--
+
+INSERT INTO `user_roles` (`id_user`, `id_role`) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(2, 2),
+(3, 3);
 
 --
 -- Indexes for dumped tables
@@ -189,15 +227,13 @@ ALTER TABLE `submission_attachments`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id_user`),
-  ADD KEY `id_advisor` (`id_advisor`);
+  ADD PRIMARY KEY (`id_user`);
 
 --
 -- Indexes for table `user_roles`
 --
 ALTER TABLE `user_roles`
-  ADD PRIMARY KEY (`id_user`,`id_role`),
-  ADD KEY `id_role` (`id_role`);
+  ADD PRIMARY KEY (`id_user`,`id_role`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -207,7 +243,7 @@ ALTER TABLE `user_roles`
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `id_course` int(10) unsigned NOT NULL AUTO_INCREMENT;
+  MODIFY `id_course` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT for table `queues`
 --
@@ -222,7 +258,7 @@ ALTER TABLE `queue_elements`
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id_role` int(10) unsigned NOT NULL AUTO_INCREMENT;
+  MODIFY `id_role` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `submissions`
 --
@@ -237,46 +273,4 @@ ALTER TABLE `submission_attachments`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id_user` int(10) unsigned NOT NULL AUTO_INCREMENT;
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `courses`
---
-ALTER TABLE `courses`
-  ADD CONSTRAINT `courses_ibfk_1` FOREIGN KEY (`id_added_by`) REFERENCES `users` (`id_user`),
-  ADD CONSTRAINT `courses_ibfk_2` FOREIGN KEY (`id_coordinator`) REFERENCES `users` (`id_user`);
-
---
--- Constraints for table `queues`
---
-ALTER TABLE `queues`
-  ADD CONSTRAINT `queues_ibfk_1` FOREIGN KEY (`id_course`) REFERENCES `courses` (`id_course`);
-
---
--- Constraints for table `queue_elements`
---
-ALTER TABLE `queue_elements`
-  ADD CONSTRAINT `queue_elements_ibfk_1` FOREIGN KEY (`id_queue`) REFERENCES `queues` (`id_queue`);
-
---
--- Constraints for table `submissions`
---
-ALTER TABLE `submissions`
-  ADD CONSTRAINT `submissions_ibfk_1` FOREIGN KEY (`id_queue`) REFERENCES `queues` (`id_queue`),
-  ADD CONSTRAINT `submissions_ibfk_2` FOREIGN KEY (`id_user`) REFERENCES `users` (`id_user`);
-
---
--- Constraints for table `users`
---
-ALTER TABLE `users`
-  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`id_advisor`) REFERENCES `users` (`id_user`);
-
---
--- Constraints for table `user_roles`
---
-ALTER TABLE `user_roles`
-  ADD CONSTRAINT `user_roles_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `users` (`id_user`),
-  ADD CONSTRAINT `user_roles_ibfk_2` FOREIGN KEY (`id_role`) REFERENCES `roles` (`id_role`);
+  MODIFY `id_user` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
