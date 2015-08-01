@@ -22,6 +22,9 @@ $app->post('/register', $guest(), function () use ($app) {
     $lastname = $request->post('lastname');
     $major = $request->post('major');
     $advisor = $request->post('advisor');
+    if (!isset($advisor)) {
+        $advisor = 0;
+    }
     $password = $request->post('password');
     $passwordConfirm = $request->post('password_confirm');
 
