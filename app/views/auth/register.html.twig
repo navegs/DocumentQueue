@@ -3,40 +3,41 @@
 {% block title %}Register{% endblock %}
 
 {% block content %}
-    <form action="{{ urlFor('register.post') }}" method="post" autocomplete="off">
-        <div>
-            <label for="email">Email</label>
-            <input type="text" name="email" id="email">
-        </div>
-        <div>
-            <label for="firstname">First Name</label>
-            <input type="text" name="firstname" id="firstname">
-        </div>
-        <div>
-            <label for="lastname">Last Name</label>
-            <input type="text" name="lastname" id="lastname">
-        </div>
-        <div>
-            <label for="major">Major</label>
-            <input type="text" name="major" id="major">
-        </div>
-         <div>
-            <label for="advisor">Advisor</label>
-            <select name='advisor' id='advisor'>
-                {% for user in advisors %} 
-                <option value="{{ user.id_user }}">{{ user.last_name }}, {{ user.first_name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div>
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password">
-        </div>
-        <div>
-            <label for="password_confirm">Confirm Password</label>
-            <input type="password" name="password_confirm" id="password_confirm">
-        </div>
-
-        <div><input type="submit" value="Register"></div>
-    </form>
+<div id="content" class="container">
+            <form role="form" action="{{ urlFor('register.post') }}" method="post" autocomplete="off">
+                <div class="form-group col-xs-4">
+                    <label for="email">Email</label>
+                    <input type="text" class="form-control" name="email" id="email" placeholder="myemail@stevens.edu">
+                </div>
+                <div class="form-group">
+                    <label for="firstname">First Name</label>
+                    <input type="text" class="form-control" name="firstname" id="firstname">
+                </div>
+                <div class="form-group">
+                    <label for="lastname">Last Name</label>
+                    <input type="text" class="form-control" name="lastname" id="lastname">
+                </div>
+                <div class="form-group">
+                    <label for="major">Major</label>
+                    <input type="text" class="form-control" name="major" id="major">
+                </div>
+                 <div class="form-group">
+                    <label for="advisor">Advisor</label>
+                    <select class="form-control" name='advisor' id='advisor'>
+                        {% for user in advisors %} 
+                        <option value="{{ user.id_user }}">{{ user.last_name }}, {{ user.first_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                </div>
+                <div class="form-group">
+                    <label for="password_confirm">Confirm Password</label>
+                    <input type="password" class="form-control" name="password_confirm" id="password_confirm" placeholder="Confirm password">
+                </div>
+                <div><button type="submit" class="btn btn-default">Register</button></div>
+            </form>
+</div>
 {% endblock %}

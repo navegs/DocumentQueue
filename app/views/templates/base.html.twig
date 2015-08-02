@@ -2,6 +2,7 @@
 <html lang="en-US">
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <base href="{{ baseUrl }}/">
         {% block head %}
         <link rel="stylesheet" href="css/stylesheet.css" />
@@ -9,6 +10,8 @@
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <!-- FONT AWESOME ICONS  -->
         <link href="css/font-awesome.css" rel="stylesheet" />
+        <!-- JQUERY BOOTGRID STYLE  -->
+        <link href="css/jquery.bootgrid.min.css" rel="stylesheet">
         <!-- CUSTOM STYLE  -->
         <link href="css/style.css" rel="stylesheet" />
        <title>DocManager | {% block title %}{% endblock %}</title>
@@ -19,9 +22,9 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span> 
                 </button>
                 <a class="navbar-brand" href="{{ urlFor('home') }}">
                     <img src="images/Stevens-Logo-Preview.png" alt="Stevens Logo" />
@@ -40,8 +43,10 @@
                                 <hr />
                                 <h5><strong>Major : </strong>
                                 {{ auth.major }}</h5>
+                                {% if auth.advisor.first_name %}
                                 <h5><strong>Advisor : </strong>
                                 {{ auth.advisor.first_name }} {{ auth.advisor.last_name }}</h5>
+                                {% endif %}
                                 <hr />
                                 <a href="#" class="btn btn-info btn-sm">Profile</a>&nbsp; <a href="{{ urlFor('logout') }}" class="btn btn-danger btn-sm">Logout</a>
                             </div>
@@ -55,14 +60,24 @@
     <!-- HEADER END-->
     {% include 'templates/partials/messages.html.twig' %}
     <nav>{% include 'templates/partials/nav.html.twig' %}</nav>
-    <div id="content">{% block content %}{% endblock %}</div>
-    <div id="footer">
-        {% block footer %}
-            Brought to you by Scott Nave & Adam Taranov, CS546 2015 Summer
-        {% endblock %}
-    </div>
+    <!-- MENU SECTION END-->
+    {% block content %}{% endblock %}
+    <!-- CONTENT SECTION END-->
+    <footer>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    {% block footer %}
+                    <span class="copy-left">©</span> 2015 CS546 Summer | By : <a href="https://www.linkedin.com/in/scottnave" target="_blank"><i class="fa fa-linkedin"></i> Scott Nave</a> | Adam Taranov | <a href="https://github.com/navegs/DocumentQueue" target="_blank"><i class="fa fa-github"></i> Git Project</a>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- FOOTER SECTION END-->
     <script src="js/jquery-2.1.4.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.bootgrid.min.js"></script>
     {% if flash.global %}
     <script>
         $(document).ready(function () {

@@ -8,7 +8,11 @@
     required to access this route.
  */
 $app->get('/admin', $authorizationCheck(['ADMIN']), function () use ($app) {
-    $app->render('admin/admin.html.twig');
+    $users = $app->user->get()->load('advisor');
+
+    $app->render('admin/admin.html.twig', [
+        'users' => $users
+    ]);
 })->name('admin');
 
 $app->get('/admin/user', $authorizationCheck(['ADMIN']), function () use ($app) {

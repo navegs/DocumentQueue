@@ -24,6 +24,7 @@
 body {
     font-family: 'Roboto', sans-serif;
     line-height: 30px;
+    padding-bottom: 70px;
 }
 
 .set-radius-zero {
@@ -198,17 +199,18 @@ header {
    FOOTER SECTION STYLES
  ============================================================ */
 footer {
-    padding: 10px;
-    color: #fff;
-    font-size: 12px;
-    background-color: #C36464;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    background-color: #eeeeee;
 }
-
+/*
     footer a, footer a:hover {
         color: #fff;
         text-decoration: none;
     }
-
+*/
 /*==============================================
     DASHBOARD  STYLES    
  =============================================*/
@@ -313,3 +315,15 @@ footer {
 .btn-google {
     background-color: #c32f10;
 }
+
+.copy-left {
+    display: inline-block;
+    text-align: right;
+    margin: 0px;
+    -moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    filter: FlipH;
+    -ms-filter: "FlipH";
+ }

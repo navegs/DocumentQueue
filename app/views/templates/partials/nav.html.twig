@@ -1,20 +1,20 @@
     <section class="menu-section">
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="navbar-collapse collapse ">
+                    <div class="navbar-collapse collapse">
                         <ul id="menu-top" class="nav navbar-nav navbar-right">
-                            <li><a href="{{ urlFor('home') }}">Home</a></li>
+                            <li><a href="{{ urlFor('home') }}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
                             {% if auth %}
-                                <li><a href="{{ urlFor('logout') }}">Log out</a></li>
-                                <li><a href="{{ urlFor('course') }}">Course Listing</a></li>
-                                <li><a href="{{ urlFor('advisor') }}">Advisor Listing</a></li>
+                                <li><a href="{{ urlFor('course') }}"><span class="glyphicon glyphicon-book"></span> Courses</a></li>
+                                <li><a href="{{ urlFor('advisor') }}"><span class="glyphicon glyphicon-education"></span> Advisors</a></li>
                                 {% if auth.hasRole('ADMIN') %}
-                                <li><a href="{{ urlFor('admin') }}">Administration</a></li>
+                                <li><a href="{{ urlFor('admin') }}"><span class="glyphicon glyphicon-cog"></span> Administration</a></li>
                                 {% endif %}
+                                <li><a href="{{ urlFor('logout') }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                             {% else %}
-                                <li><a href="{{ urlFor('register') }}">Register</a></li>
-                                <li><a href="{{ urlFor('login') }}">Login</a></li>
+                                <li><a href="{{ urlFor('register') }}"><span class="glyphicon glyphicon-user"></span> Register</a></li>
+                                <li><a href="{{ urlFor('login') }}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
                             {% endif %}
                         </ul>
                     </div>
