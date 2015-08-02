@@ -10,9 +10,10 @@ Description of application goes here
 
 ## Installation
 
-Create database using `/app/sql/documentmanager.sql`
+* Create database using `/app/sql/documentmanager.sql`
+* Create database user using your preferred method and ensure the user has permissions to the database 
 
-Default database creates the following:
+By default, the script creates the `document_manager` database, required tables and the following seed data:
 * **Roles:**
   * ADMIN
   * ADVISOR
