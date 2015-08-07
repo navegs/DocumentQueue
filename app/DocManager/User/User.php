@@ -30,13 +30,18 @@ class User extends Eloquent
 
     public function hasRole($roleName)
     {
-        foreach ($this->roles as $role) {
-            if (strcasecmp($role['name'], $roleName)) {
+        foreach ($this->getRoles() as $role) {
+            if (strcasecmp($role['name'], $roleName) == 0) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    public function getRoles()
+    {
+        return $this->roles->toArray();
     }
 
     public function advisor()

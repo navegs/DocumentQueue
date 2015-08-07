@@ -168,6 +168,8 @@ header {
     font-weight: 500;
     padding: 10px 10px 10px 10px;
     text-transform: uppercase;
+    background-color: #A32638;
+
 }
 
 .menu-top-active {
@@ -179,6 +181,7 @@ header {
 }
 
 .menu-section .dropdown-menu > li > a:hover,.menu-section .dropdown-menu > li > a:focus {
+    font-color: #000000;
     background-color: #F0677C!important;
 }
 
@@ -195,6 +198,12 @@ header {
 .navbar {
     margin-bottom: 0px;
 }
+
+/* Bootstrap overrides */
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+  background-color: #EBEBE0;
+}
+
 /* =============================================================
    FOOTER SECTION STYLES
  ============================================================ */

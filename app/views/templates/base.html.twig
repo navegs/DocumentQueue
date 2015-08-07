@@ -77,9 +77,9 @@
     <!-- FOOTER SECTION END-->
     <script src="js/jquery-2.1.4.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    <script src="js/jquery.bootgrid.min.js"></script>
-    {% if flash.global %}
+    <script src="js/jquery.bootgrid.js"></script>
     <script>
+        {% if flash.global %}
         $(document).ready(function () {
             setTimeout(function () {
                 $('#notice_wrapper').fadeOut('slow', function () {
@@ -87,7 +87,34 @@
                 })
             }, 4500);
         });
+        {% endif %}
+
+        /*
+            JS Helper function to create a form and post provided data
+         */
+        function post(path, params, method) {
+            method = method || "post"; // Set method to post by default if not specified.
+
+            var form = document.createElement("form");
+            form.setAttribute("method", method);
+            form.setAttribute("action", path);
+
+            for(var key in params) {
+                if(params.hasOwnProperty(key)) {
+                    var hiddenField = document.createElement("input");
+                    hiddenField.setAttribute("type", "hidden");
+                    hiddenField.setAttribute("name", key);
+                    hiddenField.setAttribute("value", params[key]);
+
+                    form.appendChild(hiddenField);
+                 }
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        }
     </script>
-    {% endif %}
+    {% block script %}
+    {% endblock %}
     </body>
 </html>
