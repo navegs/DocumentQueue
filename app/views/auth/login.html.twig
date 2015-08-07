@@ -3,17 +3,38 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-    <form action="{{ urlFor('login.post') }}" method="post" autocomplete="off">
-        <div>
-            <label for="email">Email</label>
-            <input type="text" name="email" id="email">
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>Login</h3>
+    </div>
+    <form class="form-horizontal" role="form" action="{{ urlFor('login.post') }}" method="post" autocomplete="off">
+    <div class="panel-body">
+        <div class="container">
+            <div class="form-group">
+                <label class="control-label col-sm-1" for="email">Email</label>
+                <div class="col-sm-4">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
+                        <input type="email" class="form-control" name="email" id="email" placeholder="Enter email">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-1" for="password">Password</label>
+                <div class="col-sm-4">                
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
+                        <input type="password" class="form-control" name="password" id="password" placeholder="Enter password">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-4 col-sm-4">
+                    <button type="submit" class="btn btn-default">Login</button>                
+                </div>
+            </div>
         </div>
-        <div>
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password">
-        </div>
-        <div>
-            <input type="submit" name="" value="Login">
-        </div>
+    </div>
     </form>
+</div>
 {% endblock %}
