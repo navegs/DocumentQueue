@@ -3,9 +3,10 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <h1>
+<div class="container">
+    <h2>
         Welcome to the Steven's Document Workflow Management application.        
-    </h1>
+    </h2>
     {% if not auth %}
     <p>
         You must <a href="{{ urlFor('register') }}">register</a> before submitting documents for review.
@@ -20,4 +21,5 @@
             <li>Course Prerequisite Waiver</li>
         </ul>
     <p>Students can search for available document queues by course or advisor.</p>
+</div>
 {% endblock %}
