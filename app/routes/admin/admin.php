@@ -2,6 +2,7 @@
 
 use DocManager\User\User;
 use DocManager\Role\Role;
+use DocManager\Course\Course;
 
 /*
     Routes for administrator functionality
@@ -28,24 +29,10 @@ $app->get('/admin/user', $authorizationCheck(['ADMIN']), function () use ($app) 
         Retrieve a collection of all users loading the advisor user relationship
      */
     $users = $app->user->get()->load('advisor');
-    /*
-        Retrieve a collection of all roles
-     */
-    $role = new Role();
-    $roles = $role->get();
-    /*
-        Retrieve a collection of users that have the 'ADVISOR' role.
-        This will be passed into the view so users can select a valid advisor when registering.
-     */
-    $advisors = $app->user->whereHas('roles', function ($q) {
-        $q->where('name', '=', 'ADVISOR');
-    })->get()->sortBy('last_name');
 
     // Render the view passing in a used objects
     $app->render('admin/admin.user.html.twig', [
-        'users' => $users,
-        'roles' => $roles,
-        'advisors' => $advisors
+        'users' => $users
     ]);
 })->name('admin.users');
 
@@ -207,9 +194,138 @@ $app->post('/admin/user/delete', $authorizationCheck(['ADMIN']), function () use
 })->name('admin.deleteUser');
 
 /*
-    Route: Admin Courses Home
+    Route: Admin Course Home
     Name: admin.courses
  */
 $app->get('/admin/course', $authorizationCheck(['ADMIN']), function () use ($app) {
-    $app->render('admin/admin.course.html.twig');
+    /*
+        Retrieve a collection of all users loading the advisor user relationship
+     */
+    $courses = Course::with('coordinator', 'addedBy')->get();
+
+    // Render the view passing in a used objects
+    $app->render('admin/admin.course.html.twig', [
+        'courses' => $courses
+    ]);
 })->name('admin.courses');
+
+/*
+    Route: Admin Delete Course(s)
+    Name: admin.deleteCourse
+ */
+$app->post('/admin/course/delete', $authorizationCheck(['ADMIN']), function () use ($app) {
+    $request = $app->request;
+    $courseIdsStr = $request->post('courseIds');
+
+    if (isset($courseIdsStr) && $courseIdsStr != "") {
+        // Convert the comma delimited string of user ids into an array of ints
+        $courseIds = array_map('intval', explode(",", $courseIdsStr));
+
+        // Loop through each user id
+        foreach ($courseIds as $courseId) {
+            $course = Course::where('id_course', $courseId)->first();
+                        
+            // Delete the user record
+            $course->delete();
+        }
+
+        $app->flash('global', "Course(s) deleted");
+    }
+
+    $app->response->redirect($app->urlFor('admin.courses'));
+})->name('admin.deleteCourse');
+
+/*
+    Route: Admin Create New User
+    Name: admin.newUser
+ */
+$app->get('/admin/course/new', $authorizationCheck(['ADMIN']), function () use ($app) {
+    /*
+        Retrieve a collection of users that have the 'INSTRUCTOR' role.
+        This will be passed into the view so users can select a valid advisor when registering.
+     */
+    $coordinators = $app->user->whereHas('roles', function ($q) {
+        $q->where('name', '=', 'INSTRUCTOR');
+    })->get()->sortBy('last_name');
+
+    // Render the view passing in a used variables
+    $app->render('admin/admin.newcourse.html.twig', [
+        'coordinators' => $coordinators
+    ]);
+})->name('admin.newCourse');
+
+/*
+    Route: Admin Edit Course
+    Name: admin.editCourse
+ */
+$app->get('/admin/course/:id', $authorizationCheck(['ADMIN']), function ($courseId) use ($app) {
+    // Retrieve the user's record
+    $course = Course::where('id_course', $courseId)->first()->load('coordinator');
+    if (isset($course)) {
+        /*
+            Retrieve a collection of users that have the 'INSTRUCTOR' role.
+            This will be passed into the view so users can select a valid coordinator when adding a course.
+         */
+        $coordinators = $app->user->whereHas('roles', function ($q) {
+            $q->where('name', '=', 'INSTRUCTOR');
+        })->get()->sortBy('last_name');
+
+        // Render the view passing in used objects
+        $app->render('admin/admin.editcourse.html.twig', [
+            'course' => $course,
+            'coordinators' => $coordinators
+        ]);
+    } else {
+        $app->flash('global', 'Invalid Course');
+
+        $app->response->redirect($app->urlFor('admin.courses'));
+    }
+})->name('admin.editCourse');
+
+/*
+    Route: Admin Save Course
+    Name: admin.saveCourse
+ */
+$app->post('/admin/course/save', $authorizationCheck(['ADMIN']), function () use ($app) {
+
+    $request = $app->request;
+
+    $courseId = $request->post('courseId');
+    $name = $request->post('name');
+    $description = $request->post('description');
+    $coordinator = $request->post('coordinator');
+    // Get the id of the user that is adding this course
+    $addedby = $app->auth->id_user;
+    $advisor = $request->post('advisor');
+    if (!isset($advisor)) {
+        $advisor = 0;
+    }
+
+    /*
+    TODO: Form Validation & Check for duplicate email
+     */
+
+    if (isset($courseId)) {
+        $user = Course::where('id_course', $courseId)->first();
+        $user->name = $name;
+        $user->description = $description;
+        $user->id_coordinator = $coordinator;
+        $user->id_added_by = $addedby;
+
+        $user->save();
+
+        $app->flash('global', 'Course Updated');
+    } else {
+        $course = new Course();
+        $course->create([
+            'name' => $name,
+            'description' => $description,
+            'id_coordinator' => $coordinator,
+            'id_added_by' => $addedby,
+        ]);
+
+        $app->flash('global', 'Course Added');
+    }
+
+    $app->response->redirect($app->urlFor('admin.courses'));
+})->name('admin.saveCourse');

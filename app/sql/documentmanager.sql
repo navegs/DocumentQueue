@@ -38,6 +38,19 @@ CREATE TABLE IF NOT EXISTS `courses` (
 INSERT INTO `courses` (`id_course`, `name`, `description`, `id_added_by`, `id_coordinator`) VALUES
 (1, 'Course 1', 'Proin aliquet magna eget justo facilisis, in egestas libero iaculis. In rhoncus non ante quis tincidunt. Pellentesque magna ex, fringilla finibus lectus consectetur, euismod rutrum velit', 1, 3),
 (2, 'Course 2', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(3, 'Course 3', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(4, 'Course 4', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(5, 'Course 5', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(6, 'Course 6', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(7, 'Course 7', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(8, 'Course 8', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(9, 'Course 9', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(10, 'Course 10', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(11, 'Course 11', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(12, 'Course 12', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(13, 'Course 13', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(14, 'Course 14', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
+(15, 'Course 15', 'Sed eget elit sit amet tellus vehicula iaculis ut non neque. Etiam sit amet massa vel libero facilisis efficitur vitae laoreet enim. Fusce at interdum erat, in pulvinar arcu. Phasellus suscipit ante.', 1, 3);
 
 -- --------------------------------------------------------
 

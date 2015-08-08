@@ -20,4 +20,14 @@ class Course extends Eloquent
     protected $guarded = [
         'id_course'
     ];
+
+    public function coordinator()
+    {
+        return $this->hasOne('DocManager\User\User', 'id_user', 'id_coordinator');
+    }
+
+    public function addedBy()
+    {
+        return $this->hasOne('DocManager\User\User', 'id_user', 'id_added_by');
+    }
 }
