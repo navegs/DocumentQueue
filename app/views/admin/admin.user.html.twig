@@ -1,41 +1,49 @@
 {% extends 'templates/base.html.twig' %}
 
-{% block title %}Admin: Users{% endblock %}
+{% block title %}Admin | Users{% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3>Admin: Users</h3>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="page-head-line">Admin: Users </h1>
+        </div>
     </div>
-    <div class="panel-body">
-            <table id="grid-selection" class="table table-condensed table-hover table-striped" data-selection="true" data-multi-select="true" data-row-select="true" data-keep-selection="true">
-                <thead>
-                    <tr>
-                        <th data-column-id="id" data-identifier="true" data-type="numeric" data-align="left" data-width="40">ID</th>
-                        <th data-column-id="last_name" data-sortable="true" data-order="asc" data-header-align="left" data-filterable="true">Last Name</th>
-                        <th data-column-id="first_name" data-sortable="true" data-header-align="left" data-filterable="true">First Name</th>
-                        <th data-column-id="email" data-formatter="editlink" data-sortable="true" data-filterable="true">Email</th>
-                        <th data-column-id="major" data-sortable="true" data-filterable="true">Major</th>
-                        <th data-column-id="advisor" data-sortable="true" data-filterable="true">Advisor</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                    <tr>
-                        <td>{{ user.id_user }}</td>
-                        <td>{{ user.last_name }}</td>
-                        <td>{{ user.first_name }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.major }}</td>
-                        <td>
-                            {% if user.advisor.id_user %}{{ user.advisor.last_name }}, {{ user.advisor.first_name }}{% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-    </div> 
-</div>   
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <table id="grid-selection" class="table table-condensed table-hover table-striped" data-selection="true" data-multi-select="true" data-row-select="true" data-keep-selection="true">
+                        <thead>
+                            <tr>
+                                <th data-column-id="id" data-identifier="true" data-type="numeric" data-align="left" data-width="40">ID</th>
+                                <th data-column-id="last_name" data-sortable="true" data-order="asc" data-header-align="left" data-filterable="true">Last Name</th>
+                                <th data-column-id="first_name" data-sortable="true" data-header-align="left" data-filterable="true">First Name</th>
+                                <th data-column-id="email" data-formatter="editlink" data-sortable="true" data-filterable="true">Email</th>
+                                <th data-column-id="major" data-sortable="true" data-filterable="true">Major</th>
+                                <th data-column-id="advisor" data-sortable="true" data-filterable="true">Advisor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.id_user }}</td>
+                                <td>{{ user.last_name }}</td>
+                                <td>{{ user.first_name }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.major }}</td>
+                                <td>
+                                    {% if user.advisor.id_user %}{{ user.advisor.last_name }}, {{ user.advisor.first_name }}{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div> 
+            </div>   
+        </div>
+    </div>
+</div>
 {% endblock %}
 {% block script %}
 <script>

@@ -4,22 +4,39 @@
 
 {% block content %}
 <div class="container">
-    <h2>
-        Welcome to the Steven's Document Workflow Management application.        
-    </h2>
-    {% if not auth %}
-    <p>
-        You must <a href="{{ urlFor('register') }}">register</a> before submitting documents for review.
-    </p>
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="page-head-line">Welcome to Steven's Document Workflow Management</h1>
+        </div>
+    </div>
+    <div class="row">
+    <div class="col-sm-{{ auth ? 8 : 12 }}">
+        {% if not auth %}
+        <p>
+            You must <a href="{{ urlFor('register') }}">register</a> before submitting documents for review.
+        </p>
+        {% endif %}
+        <p>
+            This web application allows students to submit course-related documentation for review and approval by faculty (instructors or advisors). Example scenarios requiring review include:
+        </p>
+            <ul>
+                <li>Transfer Credit Approval</li>
+                <li>Study Plan Approval</li>
+                <li>Course Prerequisite Waiver</li>
+            </ul>
+        <p>Students can search for available document queues by course or advisor.</p>
+    </div>
+    {% if auth %}
+    <div class="col-sm-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h4>My Submissions</h4>
+            </div>
+            <div class="panel-body">
+                
+            </div>
+        </div>
+    </div>
     {% endif %}
-    <p>
-        This web application allows students to submit course-related documentation for review and approval by faculty (instructors or advisors). Example scenarios requiring review include:
-    </p>
-        <ul>
-            <li>Transfer Credit Approval</li>
-            <li>Study Plan Approval</li>
-            <li>Course Prerequisite Waiver</li>
-        </ul>
-    <p>Students can search for available document queues by course or advisor.</p>
 </div>
 {% endblock %}
