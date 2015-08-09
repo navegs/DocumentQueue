@@ -30,4 +30,9 @@ class Course extends Eloquent
     {
         return $this->hasOne('DocManager\User\User', 'id_user', 'id_added_by');
     }
+
+    public function queues()
+    {
+        return $this->morphMany('DocManager\Queue\Queue', 'queueable');
+    }
 }

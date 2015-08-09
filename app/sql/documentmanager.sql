@@ -61,12 +61,10 @@ INSERT INTO `courses` (`id_course`, `name`, `description`, `id_added_by`, `id_co
 DROP TABLE IF EXISTS `queues`;
 CREATE TABLE IF NOT EXISTS `queues` (
   `id_queue` int(10) unsigned NOT NULL,
-  `queue_type` varchar(30) NOT NULL,
+  `queueable_type` varchar(30) NOT NULL,
+  `queueable_id` varchar(30) NOT NULL,
   `name` varchar(30) NOT NULL,
   `description` varchar(200) NOT NULL,
-  `order_by` varchar(20) NOT NULL,
-  `id_course` int(10) unsigned NOT NULL,
-  `id_user` int(10) unsigned NOT NULL,
   `is_enabled` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -154,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `email` varchar(50) NOT NULL,
   `major` varchar(100) NOT NULL,
   `password` varchar(200) NOT NULL,
-  `id_advisor` int(10) unsigned NOT NULL
+  `id_advisor` int(10) unsigned NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 --
@@ -206,8 +204,7 @@ ALTER TABLE `courses`
 -- Indexes for table `queues`
 --
 ALTER TABLE `queues`
-  ADD PRIMARY KEY (`id_queue`),
-  ADD KEY `id_course` (`id_course`);
+  ADD PRIMARY KEY (`id_queue`);
 
 --
 -- Indexes for table `queue_elements`

@@ -48,4 +48,14 @@ class User extends Eloquent
     {
         return $this->hasOne('DocManager\User\User', 'id_user', 'id_advisor');
     }
+
+    public function queues()
+    {
+        return $this->morphMany('DocManager\Queue\Queue', 'queueable');
+    }
+
+    public function courses()
+    {
+        return $this->hasMany('DocManager\Course\Course', 'id_coordinator', 'id_user');
+    }
 }
