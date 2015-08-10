@@ -3,87 +3,90 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container-fluid">
     <div class="row">
-        <div class="col-md-12">
+        {% if auth %}
+        <div class="col-sm-3" style="max-height: 550px;overflow-y: scroll;padding:0;margin:0;padding:0;">
+            <div class="panel panel-default">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><a href="#"><span class="badge pull-right">32</span> My Submissions</a></li>
+                </ul>
+            </div>
+            {% if auth.hasRole('ADVISOR') %}
+            <div class="panel panel-default">
+                <div class="panel-heading clearfix">
+                    <span class="panel-title">My Personal Queues</span>
+                    <div class="btn-group pull-right">
+                    <a href="{{ urlFor('addqueue', {'type': 'user', 'id': auth.id_user}) }}" role="button" class="btn btn-info btn-xs"><span class="fa fa-plus fw"></span></a>
+                    </div>           
+                </div>
+                <ul class="nav nav-pills nav-stacked">
+                {% for uq in userqueues %}
+                    <li><a href="#"><span class="fa fa-list-alt fa-lg"></span> <span class="badge pull-right">12</span> {{ uq.name }}</a></li>
+                {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% if auth.hasRole('INSTRUCTOR') %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading clearfix">
+                            <span class="fa fa-book fa-lg"></span>
+                            <span class="panel-title">
+                                Course Queues
+                            </span>
+                        </div>
+                        <table class="table table-condensed table-hover">
+                            <tbody>
+                            {% for course in mycourses %}
+                            <tr class="bg-info">
+                                <td>{{ course.name }}</td>
+                                <td class="text-right text-nowrap">
+                                    <a href="{{ urlFor('addqueue', {'type': 'course', 'id': course.id_course}) }}" role="button" class="btn btn-xs btn-default"><span class="fa fa-plus fw"></span></a>
+                                </td>
+                            </tr>
+                            {% if course.queues|length > 0 %}
+                                {% for cq in course.queues %}
+                                    {% if cq.is_enabled %}
+                                    <tr>                                
+                                        <td style="padding-left:35px;">
+                                            <a href="#"><span class="fa fa-list-alt"></span> {{ cq.name }}</a>
+                                        </td>
+                                        <td class="text-right text-nowrap">
+                                            <span class="badge">12</span>
+                                            <a href="#" role="button" class="btn btn-xs btn-default"><span class="fa fa-cog fw"></span></a>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="2" style="padding-left:35px;">No active queues for this course</td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        <div class="col-md-{{ auth ? 9 : 12 }}">
             <h1 class="page-head-line">Welcome to Steven's Document Workflow Management</h1>
+            {% if not auth %}
+            <p>
+                You must <a href="{{ urlFor('register') }}">register</a> before submitting documents for review.
+            </p>
+            {% endif %}
+            <p>
+                This web application allows students to submit course-related documentation for review and approval by faculty (instructors or advisors). Example scenarios requiring review include:
+            </p>
+                <ul>
+                    <li>Transfer Credit Approval</li>
+                    <li>Study Plan Approval</li>
+                    <li>Course Prerequisite Waiver</li>
+                </ul>
+            <p>Students can search for available document queues by course or advisor.</p>
         </div>
-    </div>
-    <div class="row">
-    <div class="col-sm-{{ auth ? 8 : 12 }}">
-        {% if not auth %}
-        <p>
-            You must <a href="{{ urlFor('register') }}">register</a> before submitting documents for review.
-        </p>
-        {% endif %}
-        <p>
-            This web application allows students to submit course-related documentation for review and approval by faculty (instructors or advisors). Example scenarios requiring review include:
-        </p>
-            <ul>
-                <li>Transfer Credit Approval</li>
-                <li>Study Plan Approval</li>
-                <li>Course Prerequisite Waiver</li>
-            </ul>
-        <p>Students can search for available document queues by course or advisor.</p>
-    </div>
-    {% if auth %}
-    <div class="col-sm-4">
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <span class="panel-title">My Submissions</span>
-            </div>
-            <div class="panel-body">
-                
-            </div>
-        </div>
-        {% if auth.hasRole('ADVISOR') %}
-        <div class="panel panel-info">
-            <div class="panel-heading clearfix">
-                <span class="panel-title">My Personal Queues</span>
-                <div class="btn-group pull-right">
-                <a href="{{ urlFor('addqueue', {'type': 'user', 'id': auth.id_user}) }}" role="button" class="btn btn-info btn-sm"><span class="fa fa-plus fw"></span></a>
-                </div>           
-            </div>
-            <div class="panel-body" style="max-height: 150px;overflow-y: scroll;padding:0;margin:0;">
-                <div class="list-group" style="padding:0;margin:0;">
-                   {% for uq in userqueues %}
-                   <a href="#" class="list-group-item">{{ uq.name }} <span class="badge">12</span></a>
-                   {% endfor %}
-                </div>   
-            </div>
-        </div>
-        {% endif %}
-        {% if auth.hasRole('INSTRUCTOR') %}
-        <div class="panel panel-info">
-            <div class="panel-heading clearfix">
-                <span class="panel-title">My Course Queues</span>
-            </div>
-            <div class="panel-body" style="max-height: 150px;overflow-y: scroll;padding:0;margin:0;">
-                <table class="table" style="padding:0;margin:0;">
-                    <tbody>
-                        {% for course in mycourses %}
-                        <tr>
-                            <td><a href="{{ urlFor('addqueue', {'type': 'course', 'id': course.id_course}) }}">{{ course.name }}</a></td>
-                        </tr>
-                        {% if course.queues %}
-                        <tr>
-                            <td style="padding:0;margin:0;">
-                                <table class="table" style="padding:0;padding-left:40;margin:0;">
-                                    {% for cq in course.queues %}
-                                        <tr><td style="">{{ cq.name }}</td><td style="text-align:right;"><span class="badge">12</span></td></tr>
-                                    {% endfor %}
-                                </table>
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
     </div>
 </div>
 {% endblock %}

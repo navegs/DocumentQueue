@@ -112,39 +112,23 @@ $app->post('/admin/user/save', $authorizationCheck(['ADMIN']), function () use (
     $password = $request->post('password');
     $passwordConfirm = $request->post('confirmpassword');
     $advisor = $request->post('advisor');
-    if (!isset($advisor)) {
-        $advisor = 0;
-    }
     $roles = $request->post('roles');
 
     /*
     TODO: Form Validation & Check for duplicate email
      */
 
-    if (isset($userId)) {
-        $user = User::where('id_user', $userId)->first();
-        $user->email = $email;
-        $user->first_name = $firstname;
-        $user->last_name = $lastname;
-        $user->major = $major;
-        $user->id_advisor = $advisor;
-        $user->password = $app->hash->password($password);
+    $user = User::updateOrCreate([
+        'id_user' => $userId,
+        'email' => $email,
+        'first_name' => $firstname,
+        'last_name' => $lastname,
+        'major' => $major,
+        'id_advisor' => $advisor,
+        'password' => $app->hash->password($password)
+    ]);
 
-        $user->save();
-
-        $app->flash('global', 'User Updated');
-    } else {
-        $user = $app->user->create([
-            'email' => $email,
-            'first_name' => $firstname,
-            'last_name' => $lastname,
-            'major' => $major,
-            'id_advisor' => $advisor,
-            'password' => $app->hash->password($password)
-        ]);
-
-        $app->flash('global', 'User Added');
-    }
+    $app->flash('global', 'User Saved');
 
     // Remove any existing roles
     $user->roles()->detach();
@@ -297,35 +281,20 @@ $app->post('/admin/course/save', $authorizationCheck(['ADMIN']), function () use
     // Get the id of the user that is adding this course
     $addedby = $app->auth->id_user;
     $advisor = $request->post('advisor');
-    if (!isset($advisor)) {
-        $advisor = 0;
-    }
 
     /*
     TODO: Form Validation & Check for duplicate email
      */
 
-    if (isset($courseId)) {
-        $user = Course::where('id_course', $courseId)->first();
-        $user->name = $name;
-        $user->description = $description;
-        $user->id_coordinator = $coordinator;
-        $user->id_added_by = $addedby;
+    $course = Course::updateOrCreate([
+        'id_course' => $courseId,
+        'name' => $name,
+        'description' => $description,
+        'id_coordinator' => $coordinator,
+        'id_added_by' => $addedby
+    ]);
 
-        $user->save();
-
-        $app->flash('global', 'Course Updated');
-    } else {
-        $course = new Course();
-        $course->create([
-            'name' => $name,
-            'description' => $description,
-            'id_coordinator' => $coordinator,
-            'id_added_by' => $addedby,
-        ]);
-
-        $app->flash('global', 'Course Added');
-    }
+    $app->flash('global', 'Course Saved');
 
     $app->response->redirect($app->urlFor('admin.courses'));
 })->name('admin.saveCourse');
