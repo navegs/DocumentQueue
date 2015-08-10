@@ -8,32 +8,39 @@
         {% if auth %}
         <div class="col-sm-3" style="max-height: 550px;overflow-y: scroll;padding:0;margin:0;padding:0;">
             <div class="panel panel-default">
-                <ul class="nav nav-pills nav-stacked">
-                    <li><a href="#"><span class="badge pull-right">32</span> My Submissions</a></li>
-                </ul>
+                <table class="table table-hover">
+                    <tbody>
+                            <tr>
+                                <td style="padding-left:35px;"><a href="#"><span class="fa fa-list-alt"></span> <a href="#"> My Submissions</a></a></td>
+                                <td style="padding-right:30px;" class="text-right text-nowrap"><span class="badge pull-right">32</span></td>
+                            </tr>
+                    </tbody>
+                </table>
             </div>
             {% if auth.hasRole('ADVISOR') %}
             <div class="panel panel-default">
                 <div class="panel-heading clearfix">
-                    <span class="panel-title">My Personal Queues</span>
+                    <span class="panel-title"><span class="glyphicon glyphicon-user"></span> My Personal Queues</span>
                     <div class="btn-group pull-right">
-                    <a href="{{ urlFor('addqueue', {'type': 'user', 'id': auth.id_user}) }}" role="button" class="btn btn-info btn-xs"><span class="fa fa-plus fw"></span></a>
+                    <a href="{{ urlFor('addqueue', {'type': 'user', 'id': auth.id_user}) }}" role="button" class="btn btn-default btn-xs"><span class="fa fa-plus fw"></span></a>
                     </div>           
                 </div>
-                <ul class="nav nav-pills nav-stacked">
-                {% for uq in userqueues %}
-                    <li><a href="#"><span class="fa fa-list-alt fa-lg"></span> <span class="badge pull-right">12</span> {{ uq.name }}</a></li>
-                {% endfor %}
-                </ul>
+                <table class="table table-condensed table-hover">
+                    <tbody>
+                        {% for uq in userqueues %}
+                            <tr>
+                                <td style="padding-left:35px;"><a href="#"><span class="fa fa-list-alt"></span> {{ uq.name }}</a></td>
+                                <td style="padding-right:30px;" class="text-right text-nowrap"><span class="badge pull-right">12</span></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
             {% endif %}
             {% if auth.hasRole('INSTRUCTOR') %}
                     <div class="panel panel-default">
-                        <div class="panel-heading clearfix">
-                            <span class="fa fa-book fa-lg"></span>
-                            <span class="panel-title">
-                                Course Queues
-                            </span>
+                        <div class="panel-heading clearfix">                            
+                            <span class="panel-title"><span class="fa fa-book fa-lg"></span> My Course Queues</span>
                         </div>
                         <table class="table table-condensed table-hover">
                             <tbody>
