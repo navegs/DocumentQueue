@@ -1,9 +1,61 @@
 {% extends 'templates/base.html.twig' %}
 
-{% block title %}Course{% endblock %}
+{% block title %}Courses{% endblock %}
 
 {% block content %}
 
-Course Page
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="page-head-line">Courses </h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <table id="grid-selection" class="table table-condensed table-hover table-striped" data-selection="true" data-multi-select="true" data-row-select="true" data-keep-selection="true">
+                        <thead>
+                            <tr>
+                                <th data-column-id="id" data-identifier="true" data-type="numeric" data-align="left" data-width="40">ID</th>
+                                <th data-column-id="name" data-formatter="editlink" data-sortable="true" data-order="asc" data-header-align="left" data-filterable="true">Name</th>
+                                <th data-column-id="description" data-sortable="false" data-header-align="left" data-filterable="true">Description</th>
+                                <th data-column-id="coordinator" data-sortable="true" data-filterable="true">Coordinator</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses %}
+                            <tr>
+                                <td>{{ course.id_course }}</td>
+                                <td>{{ course.name }}</td>
+                                <td>{{ course.description }}</td>
+                                <td>{{ course.coordinator.last_name }}, {{ course.coordinator.first_name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div> 
+            </div>   
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    // Override default bootgrid properties
+    $("#grid-selection").bootgrid({
+        templates: {        
+            header: "<div id=\"{{'{{ctx.id}}'}}\" class=\"{{'{{css.header}}'}}\"><div class=\"row\"><div class=\"col-sm-12 actionBar\"><p class=\"{{'{{css.search}}'}}\"></p><p class=\"{{'{{css.actions}}'}}\"></p></div></div></div>",
+            paginationItem: "<li class=\"{{'{{ctx.css}}'}}\"><a href=\"{{ urlFor('courses') }}{{'{{ctx.uri}}'}}\" class=\"{{'{{css.paginationButton}}'}}\">{{'{{ctx.text}}'}}</a></li>",
+        },
+        formatters: {
+            "editlink": function(column, row)
+            {
+                var url = "{{ urlFor ('courseItemSubmission') }}";
+                return string = "<a href=\"" + url.replace(':id', row['id']) + "\">" + row[column.id] + "</a>";
+            }
+        }
+    });
+</script>
     
 {% endblock %}
