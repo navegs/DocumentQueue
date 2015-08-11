@@ -16,7 +16,8 @@
                     <li>Course Prerequisite Waiver</li>
                 </ul>
             <p>Students can search for available document queues by course or advisor below. Once you have located a queue, click the queue name to create a submission.</p>
-
+            
+            {% if auth %}
             <h1 class="page-head-line">Available Queues</h1>
             <table id="grid" class="table table-condensed table-hover table-striped" data-selection="false" data-multi-select="false" data-row-select="false" data-caseSensitive="false">
                 <thead>
@@ -40,8 +41,10 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% endif %}
 {% endblock %}
 {% block script %}
+{% if auth %}
 <script>
     // Override default bootgrid properties
     $("#grid").bootgrid({
@@ -61,4 +64,5 @@
         }
     });
 </script>
+{% endif %}
 {% endblock %}

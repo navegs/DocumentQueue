@@ -6,16 +6,17 @@ use DocManager\Course\Course;
 use DocManager\User\User;
 
 $app->get('/queue/add/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADVISOR']), function ($type, $id) use ($app) {
-    $course = null;
+
     if ($type == 'course') {
+        $course = Course::with('coordinator')->find(intval($id));
+
         // Check to verify that the current user is an ADMINISTRATOR or a coordinator for the course
         // before allowing a queue to be created for this course
-        if (!$app->auth->hasRole('ADMIN') || ($app->auth->id_user != Course::find(intval($id))->coordinator->id_user)) {
+        if (!$app->auth->hasRole('ADMIN') && ($app->auth->id_user != $course->coordinator->id_user)) {
             $app->flash('global', 'You can only create course queues that you are assigned to coordinate!');
 
             $app->redirect($app->urlFor('home'));
         }
-        $course = Course::find(intval($id));
     } elseif ($type == "user") {
         // Check to verify that the currently authenticated user is not trying to create a queue
         // for a different user
@@ -47,6 +48,36 @@ $app->post('/queue/save/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','A
             $app->flash('global', 'Invalid Queue Type!');
 
             $app->redirect($app->urlFor('home'));
+    }
+
+    // Get the owner model for this new Queue based on the type
+    // Check to verify that the user can perform this action before we continue
+    switch ($type) {
+        case "user":
+            $queueowner = User::find($id);
+            // Check to verify that the currently authenticated user is not trying to create a queue
+            // for a different user
+            // User shouldn't get this far since the same check was performed by the addqueue route, but
+            // this is here for those who try to circumvent the security
+            if (intval($id) != $app->auth->id_user) {
+                $app->flash('global', 'Cannot save user queues for other users!');
+
+                $app->redirect($app->urlFor('addqueue', array('type' => $type, 'id' => $id)));
+            }
+            break;
+        case "course":
+            $queueowner = Course::with('coordinator')->find($id);
+
+            // Check to verify that the current user is an ADMINISTRATOR or a coordinator for the course
+            // before allowing a queue to be saved for this course
+            // User shouldn't get this far since the same check was performed by the addqueue route, but
+            // this is here for those who try to circumvent the security
+            if (!$app->auth->hasRole('ADMIN') && ($app->auth->id_user != $queueowner->coordinator->id_user)) {
+                $app->flash('global', 'You can only save course queues that you are assigned to coordinate!');
+
+                $app->redirect($app->urlFor('addqueue', array('type' => $type, 'id' => $id)));
+            }
+            break;
     }
 
     $request = $app->request;
@@ -83,16 +114,6 @@ $app->post('/queue/save/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','A
         }
     }
 
-    // Get the owner model for this new Queue based on the type
-    switch ($type) {
-        case "user":
-            $queueowner = User::find($id);
-            break;
-        case "course":
-            $queueowner = Course::find($id);
-            break;
-    }
-
     // Update or create the queue and get reference
     $queue = Queue::updateOrCreate([
         'id_queue' => $queueid,
@@ -121,15 +142,16 @@ $app->get('/queue/view/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADVISOR'
     $queue = Queue::find(intval($id))->load('queueable');
 
     // Loop through this user's queue collection and see if this user owns this queue
-    $isOwnedByThisUser = $app->auth->queues->filter(function ($q) use ($queue) {
+    $isOwnedByThisUser = false;
+    $app->auth->queues->filter(function ($q) use ($queue) {
         if ($q->id_queue == $queue->id_queue) {
-            return true;
+            $isOwnedByThisUser = true;
         }
     });
 
     // Verify that a valid queue was found with the provided id
     if (!empty($queue)) {
-        if ($app->auth->hasRole('ADMIN') || (!empty(array_intersect($app->auth->getRoles(), ['INSTRUCTOR','ADVISOR']) &&  $isOwnedByThisUser))) {
+        if ($app->auth->hasRole('ADMIN') || ($app->auth->hasRole(['INSTRUCTOR','ADVISOR']) &&  $isOwnedByThisUser)) {
             // Administrators or Instructors/Advisors owning this queue can see all submissions
 
             $submissions = $queue->submissions;

@@ -3,6 +3,7 @@
 namespace DocManager\Middleware;
 
 use Slim\Middleware;
+use DocManager\User\User;
 
 class BeforeMiddleware extends Middleware
 {
@@ -16,7 +17,7 @@ class BeforeMiddleware extends Middleware
     public function run()
     {
         if (isset($_SESSION[$this->app->config->get('auth.session')])) {
-            $this->app->auth = $this->app->user->where('id_user', $_SESSION[$this->app->config->get('auth.session')])->first()->load('advisor');
+            $this->app->auth = User::where('id_user', $_SESSION[$this->app->config->get('auth.session')])->with('roles', 'advisor', 'queues')->first();
         }
 
         $this->app->view()->appendData([

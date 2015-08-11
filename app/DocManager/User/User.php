@@ -30,10 +30,14 @@ class User extends Eloquent
 
     public function hasRole($roleName)
     {
-        foreach ($this->getRoles() as $role) {
-            if (strcasecmp($role['name'], $roleName) == 0) {
-                return true;
+        if (is_string($roleName)) {
+            foreach ($this->getRoles() as $role) {
+                if (strcasecmp($role, $roleName) == 0) {
+                    return true;
+                }
             }
+        } elseif (is_array($roleName)) {
+            return count(array_intersect(array_values($this->getRoles()), $roleName));
         }
 
         return false;
@@ -41,7 +45,11 @@ class User extends Eloquent
 
     public function getRoles()
     {
-        return $this->roles->toArray();
+        $roles = array();
+        foreach ($this->roles->toArray() as $role) {
+            array_push($roles, $role['name']);
+        }
+        return $roles;
     }
 
     public function advisor()
