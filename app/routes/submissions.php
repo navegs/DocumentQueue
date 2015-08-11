@@ -1,16 +1,15 @@
 <?php
 
 use DocManager\Course\Course;
-use DocManager\Queue\Queue;
 
-$app->get('/', function () use ($app) {
+$app->get('/submissions', $authenticated(), function () use ($app) {
     $userQueues = $app->auth->queues->sortBy('name');
     $mycourses = Course::where('id_coordinator', $app->auth->id_user)->with('queues')->get()->sortBy('name');
-    $activeQueues = Queue::where('is_enabled', true)->with('queueable')->get()->sortBy('name');
+    $submissions = $app->auth->submissions;
 
-    $app->render('home.default.html.twig', [
+    $app->render('home.view.submissions.html.twig', [
         'userqueues' => $userQueues,
         'mycourses' => $mycourses,
-        'activequeues' => $activeQueues
+        'submissions' => $submissions
     ]);
-})->name('home');
+})->name('home.view.submissions');

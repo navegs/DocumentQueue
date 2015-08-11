@@ -1,0 +1,64 @@
+ {% extends 'home.html.twig' %}
+
+ {% block homecontent %}
+            <h1 class="page-head-line">Welcome to Steven's Document Workflow Management</h1>
+            {% if not auth %}
+            <p>
+                You must <a href="{{ urlFor('register') }}">register</a> before submitting documents for review.
+            </p>
+            {% endif %}
+            <p>
+                This web application allows students to submit course-related documentation for review and approval by faculty (instructors or advisors). Example scenarios requiring review include:
+            </p>
+                <ul>
+                    <li>Transfer Credit Approval</li>
+                    <li>Study Plan Approval</li>
+                    <li>Course Prerequisite Waiver</li>
+                </ul>
+            <p>Students can search for available document queues by course or advisor below. Once you have located a queue, click the queue name to create a submission.</p>
+
+            <h1 class="page-head-line">Available Queues</h1>
+            <table id="grid" class="table table-condensed table-hover table-striped" data-selection="false" data-multi-select="false" data-row-select="false" data-caseSensitive="false">
+                <thead>
+                    <tr>
+                        <th data-column-id="id" data-identifier="true" data-type="numeric" data-align="left" data-width="40">ID</th>
+                        <th data-column-id="name" data-formatter="editlink" data-sortable="true" data-order="asc" data-header-align="left" data-width="200">Name</th>
+                        <th data-column-id="description" data-sortable="false" data-header-align="left">Description</th>
+                        <th data-column-id="type" data-sortable="true" data-formatter="icon" data-width="40" data-header-align="right" data-align="right"></th>
+                        <th data-column-id="belongsTo" data-width="200" data-sortable="true">Belongs To</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for queue in activequeues %}
+                    <tr>
+                        <td>{{ queue.id_queue }}</td>
+                        <td>{{ queue.name }}</td>
+                        <td>{{ queue.description }}</td>
+                        <td>{{ queue.queueable_type }}</td>
+                        <td>{{ queue.queueable.name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+{% endblock %}
+{% block script %}
+<script>
+    // Override default bootgrid properties
+    $("#grid").bootgrid({
+        templates: {        
+            paginationItem: "<li class=\"{{'{{ctx.css}}'}}\"><a href=\"{{ urlFor('home') }}{{'{{ctx.uri}}'}}\" class=\"{{'{{css.paginationButton}}'}}\">{{'{{ctx.text}}'}}</a></li>",
+        },
+        formatters: {
+            "editlink": function(column, row)
+            {
+                var url = "{{ urlFor('home.view.queue') }}";
+                return string = "<a href=\"" + url.replace(':id', row['id']) + "\">" + row[column.id] + "</a>";
+            },
+            "icon": function(column, row)
+            {
+                return (row[column.id].indexOf('Course') > -1) ? "<span class=\"fa fa-book\"></span>" : "<span class=\"glyphicon glyphicon-user\"></span>";
+            }
+        }
+    });
+</script>
+{% endblock %}

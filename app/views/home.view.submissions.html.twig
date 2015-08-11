@@ -1,0 +1,54 @@
+{% extends 'home.html.twig' %}
+
+{% block title %}My Submissions{% endblock %}
+
+{% block homecontent %}
+        <h1 class="page-head-line">My Submissions</h1>
+                    <table id="grid-selection" class="table table-condensed table-hover table-striped" data-selection="true" data-multi-select="true" data-row-select="true" data-keep-selection="true">
+                        <thead>
+                            <tr>
+                                <th data-column-id="id" data-identifier="true" data-type="numeric" data-align="left" data-width="40">ID</th>
+                                <th data-column-id="name" data-formatter="editlink" data-sortable="true" data-header-align="left" data-filterable="true">Submitted By</th>
+                                <th data-column-id="status" data-sortable="false" data-header-align="left" data-filterable="true">Status</th>
+                                <th data-column-id="submitted" data-sortable="true" data-order="desc">Submitted</th>
+                                <th data-column-id="updated" data-sortable="true">Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sub in submissions %}
+                            <tr>
+                                <td>{{ sub.id_submission }}</td>
+                                <td>{{ sub.user.last_name }}, {{ sub.user.first_name }}</td>
+                                <td>{{ sub.status }}</td>
+                                <td>{{ sub.created_at }}</td>
+                                <td>{{ sub.updated_last }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+{% endblock %}
+{% block script %}
+<script>
+    // Override default bootgrid properties
+    $("#grid-selection").bootgrid({
+        templates: {        
+            header: "<div id=\"{{'{{ctx.id}}'}}\" class=\"{{'{{css.header}}'}}\"><div class=\"row\"><div class=\"col-sm-12 actionBar\"><a href=\"{{ urlFor('admin.newCourse') }}\" role=\"button\" class=\"btn btn-default pull-left\"><span class=\"fa fa-list\"></span> Create</a><button type=\"button\" class=\"btn btn-default pull-left\" id=\"deleteBtn\"><span class=\"fa fa-trash\"></span> Delete</button><p class=\"{{'{{css.search}}'}}\"></p><p class=\"{{'{{css.actions}}'}}\"></p></div></div></div>",
+            paginationItem: "<li class=\"{{'{{ctx.css}}'}}\"><a href=\"{{ urlFor('admin.courses') }}{{'{{ctx.uri}}'}}\" class=\"{{'{{css.paginationButton}}'}}\">{{'{{ctx.text}}'}}</a></li>",
+        },
+        formatters: {
+            "editlink": function(column, row)
+            {
+                var url = "#";
+                return string = "<a href=\"" + url.replace(':id', row['id']) + "\">" + row[column.id] + "</a>";
+            }
+        }
+    });
+
+    $('#deleteBtn').click(function () {
+        var selected = $("#grid-selection").bootgrid("getSelectedRows");
+        if(selected) {
+            post("{{ urlFor('admin.deleteCourse') }}", {courseIds: selected});
+        }
+    });
+</script
+{% endblock %}

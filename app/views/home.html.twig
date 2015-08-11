@@ -6,13 +6,13 @@
 <div class="container-fluid">
     <div class="row">
         {% if auth %}
-        <div class="col-sm-3" style="max-height: 550px;overflow-y: scroll;padding:0;margin:0;padding:0;">
+        <div class="col-sm-3" style="padding:0;">
             <div class="panel panel-default">
                 <table class="table table-hover">
                     <tbody>
                             <tr>
-                                <td style="padding-left:35px;"><a href="#"><span class="fa fa-list-alt"></span> <a href="#"> My Submissions</a></a></td>
-                                <td style="padding-right:30px;" class="text-right text-nowrap"><span class="badge pull-right">32</span></td>
+                                <td style="padding-left:35px;"><a href="{{ urlFor('home.view.submissions') }}"><span class="fa fa-list-alt"></span> My Submissions</a></td>
+                                <td style="padding-right:30px;" class="text-right text-nowrap"><span class="badge pull-right">{{ auth.submissions.count }}</span></td>
                             </tr>
                     </tbody>
                 </table>
@@ -28,9 +28,9 @@
                 <table class="table table-condensed table-hover">
                     <tbody>
                         {% for uq in userqueues %}
-                            <tr>
-                                <td style="padding-left:35px;"><a href="#"><span class="fa fa-list-alt"></span> {{ uq.name }}</a></td>
-                                <td style="padding-right:30px;" class="text-right text-nowrap"><span class="badge pull-right">12</span></td>
+                            <tr{% if (queue) and (queue.id_queue == uq.id_queue) %} class="info"{% endif %}>
+                                <td style="padding-left:35px;"><a href="{{ urlFor('home.view.queue', {id: uq.id_queue}) }}"><span class="fa fa-list-alt"></span> {{ uq.name }}</a></td>
+                                <td style="padding-right:30px;" class="text-right text-nowrap"><span class="badge pull-right">{{ uq.submissions.count }}</span></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -45,7 +45,7 @@
                         <table class="table table-condensed table-hover">
                             <tbody>
                             {% for course in mycourses %}
-                            <tr class="bg-info">
+                            <tr class="bg-warning">
                                 <td>{{ course.name }}</td>
                                 <td class="text-right text-nowrap">
                                     <a href="{{ urlFor('addqueue', {'type': 'course', 'id': course.id_course}) }}" role="button" class="btn btn-xs btn-default"><span class="fa fa-plus fw"></span></a>
@@ -54,12 +54,12 @@
                             {% if course.queues|length > 0 %}
                                 {% for cq in course.queues %}
                                     {% if cq.is_enabled %}
-                                    <tr>                                
+                                    <tr{% if (queue) and (queue.id_queue == cq.id_queue) %} class="info"{% endif %}>
                                         <td style="padding-left:35px;">
-                                            <a href="#"><span class="fa fa-list-alt"></span> {{ cq.name }}</a>
+                                            <a href="{{ urlFor('home.view.queue', {id: cq.id_queue}) }}"><span class="fa fa-list-alt"></span> {{ cq.name }}</a>
                                         </td>
                                         <td class="text-right text-nowrap">
-                                            <span class="badge">12</span>
+                                            <span class="badge">{{ cq.submissions.count }}</span>
                                             <a href="#" role="button" class="btn btn-xs btn-default"><span class="fa fa-cog fw"></span></a>
                                         </td>
                                     </tr>
@@ -78,21 +78,8 @@
         </div>
         {% endif %}
         <div class="col-md-{{ auth ? 9 : 12 }}">
-            <h1 class="page-head-line">Welcome to Steven's Document Workflow Management</h1>
-            {% if not auth %}
-            <p>
-                You must <a href="{{ urlFor('register') }}">register</a> before submitting documents for review.
-            </p>
-            {% endif %}
-            <p>
-                This web application allows students to submit course-related documentation for review and approval by faculty (instructors or advisors). Example scenarios requiring review include:
-            </p>
-                <ul>
-                    <li>Transfer Credit Approval</li>
-                    <li>Study Plan Approval</li>
-                    <li>Course Prerequisite Waiver</li>
-                </ul>
-            <p>Students can search for available document queues by course or advisor.</p>
+            {% block homecontent %}
+            {% endblock %}
         </div>
     </div>
 </div>

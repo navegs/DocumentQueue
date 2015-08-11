@@ -10,6 +10,8 @@ require INC_ROOT . '/app/routes/auth/logout.php';
 
 require INC_ROOT . '/app/routes/queue.php';
 
+require INC_ROOT . '/app/routes/submissions.php';
+
 require INC_ROOT . '/app/routes/course.php';
 
 require INC_ROOT . '/app/routes/advisor.php';

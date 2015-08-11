@@ -10,7 +10,7 @@ $app->get('/queue/add/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADV
     if ($type == 'course') {
         // Check to verify that the current user is an ADMINISTRATOR or a coordinator for the course
         // before allowing a queue to be created for this course
-        if (!$app->auth->hasRole('ADMIN') && ($app->auth->id_user != Course::find(intval($id))->coordinator->id_user)) {
+        if (!$app->auth->hasRole('ADMIN') || ($app->auth->id_user != Course::find(intval($id))->coordinator->id_user)) {
             $app->flash('global', 'You can only create course queues that you are assigned to coordinate!');
 
             $app->redirect($app->urlFor('home'));
@@ -113,3 +113,43 @@ $app->post('/queue/save/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','A
 
     $app->response->redirect($app->urlFor('home'));
 })->name('savequeue');
+
+$app->get('/queue/view/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADVISOR']), function ($id) use ($app) {
+    $userQueues = $app->auth->queues->sortBy('name');
+    $mycourses = Course::where('id_coordinator', $app->auth->id_user)->with('queues')->get()->sortBy('name');
+    $submissions;
+    $queue = Queue::find(intval($id))->load('queueable');
+
+    // Loop through this user's queue collection and see if this user owns this queue
+    $isOwnedByThisUser = $app->auth->queues->filter(function ($q) use ($queue) {
+        if ($q->id_queue == $queue->id_queue) {
+            return true;
+        }
+    });
+
+    // Verify that a valid queue was found with the provided id
+    if (!empty($queue)) {
+        if ($app->auth->hasRole('ADMIN') || (!empty(array_intersect($app->auth->getRoles(), ['INSTRUCTOR','ADVISOR']) &&  $isOwnedByThisUser))) {
+            // Administrators or Instructors/Advisors owning this queue can see all submissions
+
+            $submissions = $queue->submissions;
+
+        } else {
+            // Everyone else can only see their own submissions
+            $submissions = $app->auth->submissions;
+
+        }
+    } else {
+        // Redirect to Home if no valid queue was found with this id
+
+        $app->response->redirect($app->urlFor('home'));
+
+    }
+
+    $app->render('home.view.queue.html.twig', [
+        'queue' => $queue,
+        'userqueues' => $userQueues,
+        'mycourses' => $mycourses,
+        'submissions' => $submissions
+    ]);
+})->name('home.view.queue');

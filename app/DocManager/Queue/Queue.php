@@ -41,4 +41,9 @@ class Queue extends Eloquent
     {
         return $this->morphTo();
     }
+
+    public function submissions()
+    {
+        return $this->hasMany('DocManager\Submission\Submission', 'id_queue', 'id_queue');
+    }
 }

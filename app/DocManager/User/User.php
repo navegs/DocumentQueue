@@ -58,4 +58,14 @@ class User extends Eloquent
     {
         return $this->hasMany('DocManager\Course\Course', 'id_coordinator', 'id_user');
     }
+
+    public function submissions()
+    {
+        return $this->hasMany('DocManager\Submission\Submission', 'id_user', 'id_user');
+    }
+
+    public function name()
+    {
+        return "$this->last_name, $this->first_name";
+    }
 }
