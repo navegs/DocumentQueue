@@ -9,5 +9,5 @@ $app->get('/logout', function () use ($app) {
     // Create a flash message to notify user of logout
     $app->flash('global', 'You have been logged out.');
     // Redirect user to home page after logout is complete
-    $app->response->redirect($app->urlFor('home'));
+    return $app->response->redirect($app->urlFor('home'));
 })->name('logout');

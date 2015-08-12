@@ -31,6 +31,10 @@ body {
 .panel {margin: 0px; border-radius: 0px;}
 .panel-group .panel+ .panel {margin-top:0px; }
 
+.stevens-gray {
+    background-color: #AFAFAF
+}
+
 .set-radius-zero {
     border-radius: 0px;
     -moz-border-radius: 0px;

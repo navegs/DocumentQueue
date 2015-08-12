@@ -1,8 +1,8 @@
 <?php
 
-$app->get('/course', function () use ($app) {
-    $app->render('course.html.twig');
-})->name('course');
+use DocManager\Course\Course;
+use DocManager\Queue\Queue;
+use DocManager\Queue\QueueElement;
 
 /*
     Route: Admin Course Home
@@ -44,7 +44,7 @@ $app->get('/course/:id', function ($courseId) use ($app) {
     } else {
         $app->flash('global', 'Invalid Course');
 
-        $app->response->redirect($app->urlFor('courses'));
+        return $app->response->redirect($app->urlFor('courses'));
     }
 })->name('courseItemSubmission');
 
@@ -76,7 +76,29 @@ $app->post('/admin/course/save', function () use ($app) {
         'id_added_by' => $addedby
     ]);
 
+    // If no courseId provided, we'll assume this is a new course
+    // and add the default queue(s) and elements
+    if (empty($courseId)) {
+        /*
+            Create an array of QueueElements to add to this queue
+        */
+        $elements = [new QueueElement(['name' => 'Add/Drop', 'description' => 'Add/Drop Form'])];
+
+        // Update or create the queue and get reference
+        $queue = Queue::create([
+            'name' => 'Add/Drop',
+            'description' => 'Queue for processing course add/drop requests',
+            'is_enabled' => true
+        ]);
+
+        // Associate queue with its owner
+        $course->queues()->save($queue);
+
+        // Add queue elements for the new queue
+        $queue->elements()->saveMany($elements);
+    }
+
     $app->flash('global', 'Course Item Saved');
 
-    $app->response->redirect($app->urlFor('courses'));
+    return $app->response->redirect($app->urlFor('courses'));
 })->name('saveCourseItem');

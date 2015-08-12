@@ -43,6 +43,6 @@ $app->post('/register', $guest(), function () use ($app) {
 
     $app->flash('global', "$email is now registered.");
 
-    $app->response->redirect($app->urlFor('login'));
+    return $app->response->redirect($app->urlFor('login'));
 
 })->name('register.post');

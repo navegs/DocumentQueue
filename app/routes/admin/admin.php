@@ -92,7 +92,7 @@ $app->get('/admin/user/:id', $authorizationCheck(['ADMIN']), function ($userId) 
     } else {
         $app->flash('global', 'Invalid User');
 
-        $app->response->redirect($app->urlFor('admin.users'));
+        return $app->response->redirect($app->urlFor('admin.users'));
     }
 })->name('admin.editUser');
 
@@ -145,7 +145,7 @@ $app->post('/admin/user/save', $authorizationCheck(['ADMIN']), function () use (
         $user->roles()->attach($rolesArray);
     }
 
-    $app->response->redirect($app->urlFor('admin.users'));
+    return $app->response->redirect($app->urlFor('admin.users'));
 })->name('admin.saveUser');
 
 /*
@@ -174,7 +174,7 @@ $app->post('/admin/user/delete', $authorizationCheck(['ADMIN']), function () use
         $app->flash('global', "User(s) deleted");
     }
 
-    $app->response->redirect($app->urlFor('admin.users'));
+    return $app->response->redirect($app->urlFor('admin.users'));
 })->name('admin.deleteUser');
 
 /*
@@ -216,7 +216,7 @@ $app->post('/admin/course/delete', $authorizationCheck(['ADMIN']), function () u
         $app->flash('global', "Course(s) deleted");
     }
 
-    $app->response->redirect($app->urlFor('admin.courses'));
+    return $app->response->redirect($app->urlFor('admin.courses'));
 })->name('admin.deleteCourse');
 
 /*
@@ -262,7 +262,7 @@ $app->get('/admin/course/:id', $authorizationCheck(['ADMIN']), function ($course
     } else {
         $app->flash('global', 'Invalid Course');
 
-        $app->response->redirect($app->urlFor('admin.courses'));
+        return $app->response->redirect($app->urlFor('admin.courses'));
     }
 })->name('admin.editCourse');
 
@@ -296,5 +296,5 @@ $app->post('/admin/course/save', $authorizationCheck(['ADMIN']), function () use
 
     $app->flash('global', 'Course Saved');
 
-    $app->response->redirect($app->urlFor('admin.courses'));
+    return $app->response->redirect($app->urlFor('admin.courses'));
 })->name('admin.saveCourse');

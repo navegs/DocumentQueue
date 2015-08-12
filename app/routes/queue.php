@@ -6,6 +6,7 @@ use DocManager\Course\Course;
 use DocManager\User\User;
 
 $app->get('/queue/add/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADVISOR']), function ($type, $id) use ($app) {
+    $course = null;
 
     if ($type == 'course') {
         $course = Course::with('coordinator')->find(intval($id));
@@ -132,7 +133,7 @@ $app->post('/queue/save/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','A
 
     $app->flash('global', 'Queue Saved');
 
-    $app->response->redirect($app->urlFor('home'));
+    return $app->response->redirect($app->urlFor('home'));
 })->name('savequeue');
 
 $app->get('/queue/view/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADVISOR']), function ($id) use ($app) {
@@ -164,7 +165,7 @@ $app->get('/queue/view/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADVISOR'
     } else {
         // Redirect to Home if no valid queue was found with this id
 
-        $app->response->redirect($app->urlFor('home'));
+        return $app->response->redirect($app->urlFor('home'));
 
     }
 

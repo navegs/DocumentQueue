@@ -23,8 +23,19 @@ By default, the script creates the `document_manager` database, required tables 
 * **Users** (email/password):
   * admin@stevens.edu / admin
   * advisor@stevens.edu / advisor
-  * instructor@stevens.edu / instructor
+  * instructor1@stevens.edu / instructor
+  * instructor2@stevens.edu / instructor
+  * instructor3@stevens.edu / instructor
   * student@stevens.edu / student
+
+* **Courses**:
+ * 22 Various Course Examples with Instructors 1,2, and 3 assigned as coordinator for various courses
+
+* **Queues**:
+ * Add/Drop Queue for each course
+
+* **Queue Elements**:
+ * Add/Drop Form Element Required for each of the Add/Drop Course Queues
 
 ### Web
 * For a quick, unsecure development or testing installation, place the contents of this application in a folder of your choice. For example, create a folder called doc_manager under you web server's document root and place all files within this folder. Note: This type of setup should not be used for production.
@@ -40,3 +51,15 @@ Modify the values in these files to fit your specific environment. At a minimum,
 * `app.url`: Fully qualified URL to the location of the `public` folder (e.g. *http://YOURDOMAIN OR IP/APP PATH/public*)
 * `db`: Settings for your database
 * `mail`: Settings for your SMTP server
+
+## Security
+The application allows new users to register. No functionality other than registration is available to guest users. Once registerd, users can authenticate by logging in with their credentials. By default, new users a registered without any special roles. Special roles are ADMIN, INSTRUCTOR, and ADVISOR. These can be assigned by an Administrator when creating a new user or updating an existing users profile. All users can create submissions to active queues, track their submissions, and create comments for their submissions. Specialize role functionality includes:
+ * ADMIN
+ * * Application wide access and functionality
+ * * Manage Users and Courses
+ * INSTRUCTOR
+ * * Manage queues for courses that they are assigned
+ * * Manage all submissions for courses that they are assigned
+ * ADVISOR
+ * * Manage personal queues that they create
+ * * Manage all submissions for their personal queue
