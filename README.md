@@ -53,13 +53,15 @@ Modify the values in these files to fit your specific environment. At a minimum,
 * `mail`: Settings for your SMTP server
 
 ## Security
-The application allows new users to register. No functionality other than registration is available to guest users. Once registerd, users can authenticate by logging in with their credentials. By default, new users a registered without any special roles. Special roles are ADMIN, INSTRUCTOR, and ADVISOR. These can be assigned by an Administrator when creating a new user or updating an existing users profile. All users can create submissions to active queues, track their submissions, and create comments for their submissions. Specialize role functionality includes:
+The application allows new users to register. No functionality other than registration is available to guest users. Once registerd, users can authenticate by logging in with their credentials. By default, new users are registered without any special roles. Special roles are ADMIN, INSTRUCTOR, and ADVISOR. These can be assigned by an Administrator when creating a new user or updating an existing user's profile. All users can create submissions to active queues, track their submissions, and create comments for their submissions.
+
+Specialize role functionality includes:
  * ADMIN
- * * Application wide access and functionality
- * * Manage Users and Courses
+ *  * Application wide access and functionality
+ *  * Manage Users and Courses
  * INSTRUCTOR
- * * Manage queues for courses that they are assigned
- * * Manage all submissions for courses that they are assigned
+ *  * Manage queues for courses that they are assigned
+ *  * Manage all submissions for courses that they are assigned
  * ADVISOR
- * * Manage personal queues that they create
- * * Manage all submissions for their personal queue
+ *  * Manage personal queues that they create
+ *  * Manage all submissions for their personal queue
