@@ -136,16 +136,20 @@ $app->post('/queue/save/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','A
     return $app->response->redirect($app->urlFor('home'));
 })->name('savequeue');
 
-$app->get('/queue/view/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADVISOR']), function ($id) use ($app) {
+$app->get('/queue/view/:id', $authenticated(), function ($id) use ($app) {
+    // List of the current user's' queues
     $userQueues = $app->auth->queues->sortBy('name');
+    // List of courses that the current users owns
     $mycourses = Course::where('id_coordinator', $app->auth->id_user)->with('queues')->get()->sortBy('name');
+    // Declare the submissions collction that we'll load later depending on the users permissions
     $submissions;
+    // This is the queue that has been requested to view
     $queue = Queue::find(intval($id))->load('queueable');
 
     // Loop through this user's queue collection and see if this user owns this queue
     $isOwnedByThisUser = false;
-    $app->auth->queues->filter(function ($q) use ($queue) {
-        if ($q->id_queue == $queue->id_queue) {
+    $app->auth->queues->filter(function ($currentqueue) use ($queue) {
+        if ($currentqueue->id_queue == $queue->id_queue) {
             $isOwnedByThisUser = true;
         }
     });
@@ -159,6 +163,7 @@ $app->get('/queue/view/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADVISOR'
 
         } else {
             // Everyone else can only see their own submissions
+            // ***** NEED TO FIX THIS TO DIRECTLY QUERY SUBMISSION CLASS FOR THIS USERS SUBMISSIONS FOR THIS QUEUE
             $submissions = $app->auth->submissions;
 
         }
