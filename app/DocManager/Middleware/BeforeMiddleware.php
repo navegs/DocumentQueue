@@ -17,7 +17,7 @@ class BeforeMiddleware extends Middleware
     public function run()
     {
         if (isset($_SESSION[$this->app->config->get('auth.session')])) {
-            $this->app->auth = User::where('id_user', $_SESSION[$this->app->config->get('auth.session')])->with('roles', 'advisor', 'queues')->first();
+            $this->app->auth = User::with('roles', 'advisor', 'queues')->where('id_user', $_SESSION[$this->app->config->get('auth.session')])->first();
         }
 
         $this->app->view()->appendData([

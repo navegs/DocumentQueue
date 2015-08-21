@@ -141,6 +141,22 @@ INSERT INTO `queue_elements` (`id_element`, `id_queue`, `name`, `description`) V
     (20, 20, 'Add/Drop Form', 'Stevens Add/Drop Form'),
     (21, 21, 'Add/Drop Form', 'Stevens Add/Drop Form'),
     (22, 22, 'Add/Drop Form', 'Stevens Add/Drop Form');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `comments`
+--
+
+DROP TABLE IF EXISTS `comments`;
+CREATE TABLE IF NOT EXISTS `comments` (
+  `id_comment` int(10) unsigned NOT NULL,
+  `commentable_type` varchar(30) NOT NULL,
+  `commentable_id` varchar(30) NOT NULL,
+  `comment` varchar(200) NOT NULL,
+  `id_user` int(10) unsigned NOT NULL,
+  `created_at` datetime NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 -- --------------------------------------------------------
 
 --
@@ -174,9 +190,8 @@ CREATE TABLE IF NOT EXISTS `submissions` (
   `id_user` int(10) unsigned NOT NULL,
   `id_queue` int(10) unsigned NOT NULL,
   `status` varchar(20) NOT NULL,
-  `is_approved` tinyint(1) NOT NULL,
   `created_at` datetime NOT NULL,
-  `updated_last` datetime NOT NULL
+  `updated_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -192,9 +207,8 @@ CREATE TABLE IF NOT EXISTS `submission_attachments` (
   `name` varchar(30) NOT NULL,
   `content_type` varchar(20) NOT NULL,
   `content` blob NOT NULL,
-  `comment` varchar(500) NOT NULL,
   `created_at` datetime NOT NULL,
-  `updated_last` datetime NOT NULL
+  `updated_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -224,7 +238,8 @@ INSERT INTO `users` (`id_user`, `first_name`, `last_name`, `email`, `major`, `pa
 (3, 'Steven', 'Instructor1', 'instructor1@stevens.edu', 'Instructing', '$2y$10$BUFpslEqI7nAJzQ6AAyZd.QQzE/X0CCB85zyTT8x21jMJLHSHuiZO', 0),
 (4, 'Steven', 'Instructor2', 'instructor2@stevens.edu', 'Instructing', '$2y$10$BUFpslEqI7nAJzQ6AAyZd.QQzE/X0CCB85zyTT8x21jMJLHSHuiZO', 0),
 (5, 'Steven', 'Instructor3', 'instructor3@stevens.edu', 'Instructing', '$2y$10$BUFpslEqI7nAJzQ6AAyZd.QQzE/X0CCB85zyTT8x21jMJLHSHuiZO', 0),
-(6, 'Steven', 'Student', 'student@stevens.edu', 'Studying', '$2y$10$v8lu2g8s5rXR10jWSFv50eEBiMzM4L2dzKmiFwVbWbMucrB7Nx1AS', 2);
+(6, 'Steven', 'Student1', 'student1@stevens.edu', 'Studying', '$2y$10$v8lu2g8s5rXR10jWSFv50eEBiMzM4L2dzKmiFwVbWbMucrB7Nx1AS', 2),
+(7, 'Steven', 'Student2', 'student2@stevens.edu', 'Studying', '$2y$10$v8lu2g8s5rXR10jWSFv50eEBiMzM4L2dzKmiFwVbWbMucrB7Nx1AS', 2);
 
 -- --------------------------------------------------------
 
@@ -260,8 +275,6 @@ INSERT INTO `user_roles` (`id_user`, `id_role`) VALUES
 --
 ALTER TABLE `courses`
   ADD PRIMARY KEY (`id_course`),
-  ADD KEY `id_added_by` (`id_added_by`),
-  ADD KEY `id_coordinator` (`id_coordinator`);
 
 --
 -- Indexes for table `queues`
@@ -274,7 +287,12 @@ ALTER TABLE `queues`
 --
 ALTER TABLE `queue_elements`
   ADD PRIMARY KEY (`id_element`),
-  ADD KEY `id_queue` (`id_queue`);
+
+--
+-- Indexes for table `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`id_comment`),
 
 --
 -- Indexes for table `roles`
@@ -287,8 +305,6 @@ ALTER TABLE `roles`
 --
 ALTER TABLE `submissions`
   ADD PRIMARY KEY (`id_submission`),
-  ADD KEY `id_queue` (`id_queue`),
-  ADD KEY `id_user` (`id_user`);
 
 --
 -- Indexes for table `submission_attachments`
@@ -327,6 +343,11 @@ ALTER TABLE `queues`
 --
 ALTER TABLE `queue_elements`
   MODIFY `id_element` int(10) unsigned NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `id_comment` int(10) unsigned NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `roles`
 --

@@ -29,7 +29,7 @@ By default, the script creates the `document_manager` database, required tables 
   * student@stevens.edu / student
 
 * **Courses**:
- * 22 Various Course Examples with Instructors 1,2, and 3 assigned as coordinator for various courses
+ * 22 Courses with Instructors 1,2, and 3 assigned as coordinator (i.e. Instructor) for various courses
 
 * **Queues**:
  * Add/Drop Queue for each course
