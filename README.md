@@ -7,6 +7,7 @@ Description of application goes here
 1. Apache `mod_rewrite`, `php5_module`
 2. PHP >=5.6
 3. Mysql
+4. (Optional) PHP File Info module (php_fileinfo) - Used to detect file mime types on the server side vs. assuming that the client browser correctly detects mime types for file uploads
 
 ## Installation
 
@@ -26,7 +27,8 @@ By default, the script creates the `document_manager` database, required tables 
   * instructor1@stevens.edu / instructor
   * instructor2@stevens.edu / instructor
   * instructor3@stevens.edu / instructor
-  * student@stevens.edu / student
+  * student1@stevens.edu / student
+  * student2@stevens.edu / student
 
 * **Courses**:
  * 22 Courses with Instructors 1,2, and 3 assigned as coordinator (i.e. Instructor) for various courses
