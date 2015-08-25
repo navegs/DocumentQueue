@@ -10,6 +10,8 @@
 
 use DocManager\Helpers\Hash;
 use DocManager\User\User;
+use DocManager\Mail\Mailer;
+//use DocManager\Validation\Validator;
 use DocManager\Middleware\BeforeMiddleware;
 use Noodlehaus\Config;
 use Slim\Slim;
@@ -60,6 +62,27 @@ $app->container->set('user', function () {
 // Used for authentication and security
 $app->container->singleton('hash', function () use ($app) {
     return new Hash($app->config);
+});
+
+// Make the custom Validator helper class availabe within the Slim container
+// Used for validation
+//$app->container->singleton('validation', function () use ($app) {
+//    return new Validator;
+//});
+
+// Make the custom PHPMailer helper class availabe within the Slim container
+// Used for emailing
+$app->container->singleton('mail', function () use ($app) {
+    $mailer = new PHPMailer;
+    $mailer->Host = $app->config->get('mail.host');
+    $mailer->SMTPAuth = $app->config->get('mail.smtp_auth');
+    $mailer->SMTPSecure = $app->config->get('mail.smtp_secure');
+    $mailer->Port = $app->config->get('mail.port');
+    $mailer->Username = $app->config->get('mail.username');
+    $mailer->Password = $app->config->get('mail.password');
+    $mailer->isHTML($app->config->get('mail.html'));
+    
+    return new mailer($app->view, $mailer);
 });
 
 // Setup our views for Slim
