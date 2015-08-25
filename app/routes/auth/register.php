@@ -1,5 +1,7 @@
 <?php
 
+use DocManager\Validators\UserValidator;
+
 $app->get('/register', $guest(), function () use ($app) {
     // Retrieve a collection of users that have the 'ADVISOR'
     // role. This will be passed into the view so users can select
@@ -22,27 +24,30 @@ $app->post('/register', $guest(), function () use ($app) {
     $lastname = $request->post('lastname');
     $major = $request->post('major');
     $advisor = $request->post('advisor');
-    if (!isset($advisor)) {
-        $advisor = 0;
-    }
     $password = $request->post('password');
-    $passwordConfirm = $request->post('password_confirm');
+    $passwordConfirm = $request->post('password_confirmation');
 
-    /*
-    TODO: Form Validation & Check for duplicate email
-     */
+    $userValidator = UserValidator::make($request->post())->addContext('create');
 
-    $app->user->create([
-        'email' => $email,
-        'first_name' => $firstname,
-        'last_name' => $lastname,
-        'major' => $major,
-        'id_advisor' => $advisor,
-        'password' => $app->hash->password($password)
+    if ($userValidator->passes()) {
+        $app->user->create([
+            'email' => $email,
+            'first_name' => $firstname,
+            'last_name' => $lastname,
+            'major' => $major,
+            'id_advisor' => $advisor,
+            'password' => $app->hash->password($password)
+        ]);
+
+        $app->flash('global', "$email is now registered.");
+
+        return $app->response->redirect($app->urlFor('login'));        
+    }
+
+    $app->render('auth/register.php', [
+        'errors' => $userValidator->errors(),
+        'request' => $request
     ]);
 
-    $app->flash('global', "$email is now registered.");
-
-    return $app->response->redirect($app->urlFor('login'));
 
 })->name('register.post');

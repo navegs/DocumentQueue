@@ -11,6 +11,7 @@
 use DocManager\Helpers\Hash;
 use DocManager\User\User;
 use DocManager\Middleware\BeforeMiddleware;
+use DocManager\Validators\Validator;
 use Noodlehaus\Config;
 use Slim\Slim;
 use Slim\Views\Twig;
@@ -60,6 +61,10 @@ $app->container->set('user', function () {
 // Used for authentication and security
 $app->container->singleton('hash', function () use ($app) {
     return new Hash($app->config);
+});
+
+$app->container->singleton('validation', function () use ($app) {
+    return new Validator;
 });
 
 // Setup our views for Slim
