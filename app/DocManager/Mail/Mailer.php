@@ -4,26 +4,25 @@ namespace DocManager\Mail;
 
 class Mailer
 {
-	protected $view;
-	protected $mailer;
+    protected $view;
+    protected $mailer;
 
-	public function __construct($view, $mailer)
-	{
-		$this->view = $view;
-		$this->mailer = $mailer;
-	}
+    public function __construct($view, $mailer)
+    {
+        $this->view = $view;
+        $this->mailer = $mailer;
+    }
 
-	public function send($template, $data, $callback)
-	{
-		$message = new Message($this->mailer);
+    public function send($template, $data, $callback)
+    {
+        $message = new Message($this->mailer);
 
-		$this->view->appendData($data);
+        $this->view->appendData($data);
 
-		$message->body($this->view->render($template));
+        $message->body($this->view->render($template));
 
-		call_user_func($callback, $message);
+        call_user_func($callback, $message);
 
-		return $message;
-		//$this->mailer->send();
-	}
+        $this->mailer->send();
+    }
 }

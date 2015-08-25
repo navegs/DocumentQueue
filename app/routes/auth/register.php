@@ -42,7 +42,7 @@ $app->post('/register', $guest(), function () use ($app) {
     */
 
 
-    $app->user->create([
+    $user = $app->user->create([
         'email' => $email,
         'first_name' => $firstname,
         'last_name' => $lastname,
@@ -51,8 +51,8 @@ $app->post('/register', $guest(), function () use ($app) {
         'password' => $app->hash->password($password)
     ]);
 
-    $test = $app->mail->send('email/auth/registered.php', ['user' => $user], function ($message) use ($user) {
-        $message->to($user->email);//, $user->name);
+    $app->mail->send('email/auth/registered.html.twig', ['user' => $user], function ($message) use ($user) {
+        $message->to($user->email);
         $message->subject('Thanks for registring.');
     });
 

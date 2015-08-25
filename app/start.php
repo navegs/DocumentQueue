@@ -74,6 +74,7 @@ $app->container->singleton('hash', function () use ($app) {
 // Used for emailing
 $app->container->singleton('mail', function () use ($app) {
     $mailer = new PHPMailer;
+    $mailer->isSMTP();
     $mailer->Host = $app->config->get('mail.host');
     $mailer->SMTPAuth = $app->config->get('mail.smtp_auth');
     $mailer->SMTPSecure = $app->config->get('mail.smtp_secure');
@@ -82,7 +83,7 @@ $app->container->singleton('mail', function () use ($app) {
     $mailer->Password = $app->config->get('mail.password');
     $mailer->isHTML($app->config->get('mail.html'));
     
-    return new mailer($app->view, $mailer);
+    return new Mailer($app->view, $mailer);
 });
 
 // Setup our views for Slim
