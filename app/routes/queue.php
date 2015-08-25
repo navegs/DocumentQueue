@@ -4,6 +4,7 @@ use DocManager\Queue\Queue;
 use DocManager\Queue\QueueElement;
 use DocManager\Course\Course;
 use DocManager\User\User;
+use DocManager\Submission\Submission;
 
 $app->get('/queue/add/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADVISOR']), function ($type, $id) use ($app) {
     $course = null;
@@ -148,7 +149,7 @@ $app->get('/queue/view/:id', $authenticated(), function ($id) use ($app) {
 
     // Loop through this user's queue collection and see if this user owns this queue
     $isOwnedByThisUser = false;
-    $app->auth->queues->filter(function ($currentqueue) use ($queue) {
+    $app->auth->queues->filter(function ($currentqueue) use ($queue, &$isOwnedByThisUser) {
         if ($currentqueue->id_queue == $queue->id_queue) {
             $isOwnedByThisUser = true;
         }
@@ -159,12 +160,11 @@ $app->get('/queue/view/:id', $authenticated(), function ($id) use ($app) {
         if ($app->auth->hasRole('ADMIN') || ($app->auth->hasRole(['INSTRUCTOR','ADVISOR']) &&  $isOwnedByThisUser)) {
             // Administrators or Instructors/Advisors owning this queue can see all submissions
 
-            $submissions = $queue->submissions;
+            $submissions = $queue->submissions->load('user');
 
         } else {
-            // Everyone else can only see their own submissions
-            // ***** NEED TO FIX THIS TO DIRECTLY QUERY SUBMISSION CLASS FOR THIS USERS SUBMISSIONS FOR THIS QUEUE
-            $submissions = $app->auth->submissions;
+            // Everyone else can only see their own submissions for this queue
+            $submissions = Submission::where('id_user', $app->auth->id_user)->where('id_queue', $queue->id_queue)->with('user')->get();
 
         }
     } else {

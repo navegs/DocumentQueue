@@ -59,7 +59,7 @@ class User extends Eloquent
 
     public function queues()
     {
-        return $this->morphMany('DocManager\Queue\Queue', 'queueable');
+        return $this->hasManyThrough('DocManager\Queue\Queue', 'DocManager\Course\Course', 'id_coordinator', 'id_queue');
     }
 
     public function courses()
@@ -70,6 +70,11 @@ class User extends Eloquent
     public function submissions()
     {
         return $this->hasMany('DocManager\Submission\Submission', 'id_user', 'id_user');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany('DocManager\Comment\Comment', 'id_user', 'id_user');
     }
 
     public function name()

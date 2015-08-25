@@ -8,7 +8,7 @@
                         <thead>
                             <tr>
                                 <th data-column-id="id" data-identifier="true" data-type="numeric" data-align="left" data-width="40">ID</th>
-                                <th data-column-id="name" data-formatter="editlink" data-sortable="true" data-header-align="left" data-filterable="true">Submitted By</th>
+                                <th data-column-id="name" data-formatter="editlink" data-sortable="true" data-header-align="left" data-filterable="true" data-width="500">Owner - Queue</th>
                                 <th data-column-id="status" data-sortable="false" data-header-align="left" data-filterable="true">Status</th>
                                 <th data-column-id="submitted" data-sortable="true" data-order="desc">Submitted</th>
                                 <th data-column-id="updated" data-sortable="true">Updated</th>
@@ -18,10 +18,10 @@
                             {% for sub in submissions %}
                             <tr>
                                 <td>{{ sub.id_submission }}</td>
-                                <td>{{ sub.user.last_name }}, {{ sub.user.first_name }}</td>
+                                <td>{{ sub.queue.queueable.name }} - {{ sub.queue.name }}</td>
                                 <td>{{ sub.status }}</td>
                                 <td>{{ sub.created_at }}</td>
-                                <td>{{ sub.updated_last }}</td>
+                                <td>{{ sub.updated_at }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
