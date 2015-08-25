@@ -28,21 +28,45 @@ $app->post('/register', $guest(), function () use ($app) {
     $password = $request->post('password');
     $passwordConfirm = $request->post('password_confirm');
 
-    /*
-    TODO: Form Validation & Check for duplicate email
-     */
+    /*$v = $app->validation;
 
-    $app->user->create([
-        'email' => $email,
-        'first_name' => $firstname,
-        'last_name' => $lastname,
-        'major' => $major,
-        'id_advisor' => $advisor,
-        'password' => $app->hash->password($password)
+    $v->validate([
+        'email' => [$email, 'required|email|max(30)'],
+        'first_name' => [$firstName, 'required|max(30)'],
+        'last_name' => [$lastName, 'required|max(30)'],
+        'password' => [$password, 'required|min(6)'],
+        'password_confirm' => [$passwordConfirm, 'required|matches(password)'],
     ]);
 
-    $app->flash('global', "$email is now registered.");
+    /*
+    TODO: Form Validation & Check for duplicate email
+    */
+    //if ($v->passes()) {
+        $user = $app->user->create([
+            'email' => $email,
+            'first_name' => $firstname,
+            'last_name' => $lastname,
+            'major' => $major,
+            'id_advisor' => $advisor,
+            'password' => $app->hash->password($password)
+        ]);
 
-    return $app->response->redirect($app->urlFor('login'));
+
+        $test = $app->mail->send('email/auth/registered.php', ['user' => $user], function($message) use ($user){
+            $message->to($user->email);//, $user->name);
+            $message->subject('Thanks for registring.');
+        });
+
+        var_dump($test);
+
+        $app->flash('global', "$email is now registered.");
+
+        //return $app->response->redirect($app->urlFor('login'));
+/*    }
+    else {
+        $app->render('auth/register.php', [
+            'errors =>'])
+        die('failed');
+    }*/
 
 })->name('register.post');
