@@ -49,7 +49,7 @@ $app->post('/register', $guest(), function () use ($app) {
 
         $app->mail->send('email/auth/registered.html.twig', ['user' => $user], function ($message) use ($user) {
             $message->to($user->email);
-            $message->subject('Thanks for registring.');
+            $message->subject('Welcome to Stevens Document Manager, '.$user->first_name.'! Let\'s get started.');
         });
 
         $app->flash('global', "$email is now registered.");

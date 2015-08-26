@@ -81,6 +81,7 @@ $app->container->singleton('mail', function () use ($app) {
     $mailer->Port = $app->config->get('mail.port');
     $mailer->Username = $app->config->get('mail.username');
     $mailer->Password = $app->config->get('mail.password');
+    $mailer->SetFrom($app->config->get('mail.username'), 'Stevens Document Manager');
     $mailer->isHTML($app->config->get('mail.html'));
     
     return new Mailer($app->view, $mailer);
