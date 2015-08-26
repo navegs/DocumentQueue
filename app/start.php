@@ -11,7 +11,7 @@
 use DocManager\Helpers\Hash;
 use DocManager\User\User;
 use DocManager\Mail\Mailer;
-//use DocManager\Validation\Validator;
+use DocManager\Validation\Validator;
 use DocManager\Middleware\BeforeMiddleware;
 use Noodlehaus\Config;
 use Slim\Slim;
@@ -66,9 +66,9 @@ $app->container->singleton('hash', function () use ($app) {
 
 // Make the custom Validator helper class availabe within the Slim container
 // Used for validation
-//$app->container->singleton('validation', function () use ($app) {
-//    return new Validator;
-//});
+$app->container->singleton('validation', function () use ($app) {
+    return new Validator;
+});
 
 // Make the custom PHPMailer helper class availabe within the Slim container
 // Used for emailing

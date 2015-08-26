@@ -12,76 +12,90 @@
     <div class="row">
         <div class="col-md-12">
             <form class="form-horizontal" role="form" action="{{ urlFor('register.post') }}" method="post" autocomplete="off">
-                <div class="form-group{% if errors.first('email') %} error{% endif %}">
+                <div class="form-group row{% if errors.first('email') %} has-error has-feedback{% endif %}">
                     <label class="control-label col-sm-2" for="email">Email</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" name="email" id="email" placeholder="myemail@stevens.edu">
+                        <input type="text" class="form-control" name="email" id="email" placeholder="myemail@stevens.edu"{% if request.post('email') %} value="{{ request.post('email') }}"{% endif %}>
+                    </div>
+                    <div class="col-sm-5">
                         {% if errors.first('email') %}
-                        <span class="help-inline">{{ errors.first('email') }}</span>
+                        <span class="help-block">{{ errors.first('email') }}</span>
                         {% endif %}
                     </div>
                 </div>
-                <div class="form-group{% if errors.first('firstname') %} error{% endif %}">
+                <div class="form-group{% if errors.first('firstname') %} has-error has-feedback{% endif %}">
                     <label class="control-label col-sm-2" for="firstname">First Name</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" name="firstname" id="firstname">
+                        <input type="text" class="form-control" name="firstname" id="firstname"{% if request.post('firstname') %} value="{{ request.post('firstname') }}"{% endif %}>
+                    </div>
+                    <div class="col-sm-5">
                         {% if errors.first('firstname') %}
-                        <span class="help-inline">{{ errors.first('firstname') }}</span>
+                        <span class="help-block">{{ errors.first('firstname') }}</span>
                         {% endif %}        
                     </div>
                 </div>
-                <div class="form-group{% if errors.first('lastname') %} error{% endif %}">
+                <div class="form-group{% if errors.first('lastname') %} has-error has-feedback{% endif %}">
                     <label class="control-label col-sm-2" for="lastname">Last Name</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" name="lastname" id="lastname">
+                        <input type="text" class="form-control" name="lastname" id="lastname"{% if request.post('lastname') %} value="{{ request.post('lastname') }}"{% endif %}>
+                    </div>
+                    <div class="col-sm-5">
                         {% if errors.first('lastname') %}
-                        <span class="help-inline">{{ errors.first('lastname') }}</span>
+                        <span class="help-block">{{ errors.first('lastname') }}</span>
                         {% endif %}
                     </div>
                 </div>
-                <div class="form-group{% if errors.first('major') %} error{% endif %}">
+                <div class="form-group{% if errors.first('major') %} has-error has-feedback{% endif %}">
                     <label class="control-label col-sm-2" for="major">Major</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" name="major" id="major">
+                        <input type="text" class="form-control" name="major" id="major"{% if request.post('major') %} value="{{ request.post('major') }}"{% endif %}>
+                    </div>
+                    <div class="col-sm-5">
                         {% if errors.first('major') %}
-                        <span class="help-inline">{{ errors.first('major') }}</span>
+                        <span class="help-block">{{ errors.first('major') }}</span>
                         {% endif %}
                     </div>
                 </div>
-                 <div class="form-group{% if errors.first('advisor') %} error{% endif %}">
+                 <div class="form-group{% if errors.first('advisor') %} has-error{% endif %}">
                     <label class="control-label col-sm-2" for="advisor">Advisor</label>
                     <div class="col-sm-4">
                         <select class="form-control" name='advisor' id='advisor'>
-                            {% for user in advisors %} 
-                            <option value="{{ user.id_user }}">{{ user.last_name }}, {{ user.first_name }}</option>
+                            {% for a in advisors %} 
+                            <option value="{{ a.id_user }}"{% if request.post('advisor') == a.id_user %} selected{% endif %}>{{ a.last_name }}, {{ a.first_name }}</option>
                             {% endfor %}
                         </select>
-                        {% if errors.first('advisor') %}
-                        <span class="help-inline">{{ errors.first('advisor') }}</span>
-                        {% endif %}
                     </div>
+                    <div class="col-sm-5">
+                        {% if errors.first('advisor') %}
+                        <span class="help-block">{{ errors.first('advisor') }}</span>
+                        {% endif %}
+                     </div>
                 </div>
-                <div class="form-group{% if errors.first('password') %} error{% endif %}">
+                <div class="form-group{% if errors.first('password') %} has-error has-feedback{% endif %}">
                     <label class="control-label col-sm-2" for="password">Password</label>
                     <div class="col-sm-4">
                         <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                    </div>
+                    <div class="col-sm-5">
                         {% if errors.first('password') %}
-                        <span class="help-inline">{{ errors.first('password') }}</span>
+                        <span class="help-block">{{ errors.first('password') }}</span>
                         {% endif %}
                     </div>
                 </div>
-                <div class="form-group{% if errors.first('password_confirmation') %} error{% endif %}">
-                    <label class="control-label col-sm-2" for="password_confirmation">Confirm Password</label>
+                <div class="form-group{% if errors.first('password_confirm') %} has-error has-feedback{% endif %}">
+                    <label class="control-label col-sm-2" for="password_confirm">Confirm Password</label>
                     <div class="col-sm-4">
-                        <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" placeholder="Confirm password">
-                        {% if errors.first('password_confirmation') %}
-                        <span class="help-inline">{{ errors.first('password_confirmation') }}</span>
+                        <input type="password" class="form-control" name="password_confirm" id="password_confirm" placeholder="Confirm password">
+                    </div>
+                    <div class="col-sm-5">
+                        {% if errors.first('password_confirm') %}
+                        <span class="help-block">{{ errors.first('password_confirm') }}</span>
                         {% endif %}
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-sm-7 pull-right">
-                            <button type="submit" class="btn btn-success"><span class="fa fa-pencil-square-o fa-lg fa-fw"></span> Register</button>
+                    <div class="col-sm-6">
+                            <button type="submit" class="btn btn-success pull-right"><span class="fa fa-pencil-square-o fa-lg fa-fw"></span> Register</button>
                     </div>
                 </div>
             </form>
