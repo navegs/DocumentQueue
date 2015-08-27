@@ -14,6 +14,7 @@ class Attachment extends Eloquent
     protected $fillable = [
         'id_submission',
         'name',
+        'size',
         'content_type',
         'content'
     ];

@@ -18,6 +18,82 @@ $app->get('/submissions', $authenticated(), function () use ($app) {
     ]);
 })->name('home.view.submissions');
 
+$app->get('/submission/:id', $authenticated(), function ($subId) use ($app) {
+    $submission = Submission::find(intval($subId));
+
+    if (!empty($submission)) {
+        $submission->load('user', 'queue', 'queue.queueable', 'attachments', 'comments');
+
+         // Loop through this user's queue collection and see if this user owns the queue
+         // that this submission belongs to
+        $queueOwnedByThisUser = false;
+        $app->auth->queues->filter(function ($currentqueue) use ($submission, &$queueOwnedByThisUser) {
+            if ($currentqueue->id_queue == $submission->queue->id_queue) {
+                $queueOwnedByThisUser = true;
+            }
+        });
+
+        if ($app->auth->hasRole('ADMIN') || ($submission->user->id_user == $app->auth->id_user) || ($app->auth->hasRole(['ADVISOR', 'INSTRUCTOR']) && $queueOwnedByThisUser)) {
+            // List of the current user's' queues
+            $userQueues = $app->auth->queues->sortBy('name');
+            // List of courses that the current users owns
+            $mycourses = Course::where('id_coordinator', $app->auth->id_user)->with('queues')->get()->sortBy('name');
+
+            $app->render('home.view.submission.html.twig', [
+                'userqueues' => $userQueues,
+                'mycourses' => $mycourses,
+                'submission' => $submission
+            ]);
+        } else {
+            // Redirect to Home if user has no permission to view this submission
+            return $app->response->redirect($app->urlFor('home'));
+        }
+    } else {
+        // Redirect to Home if no valid submission was found with this id
+        
+        $app->flash('global', 'Unknown Submission');
+        
+        return $app->response->redirect($app->urlFor('home'));
+    }
+})->name('home.view.submission');
+
+$app->get('/attachment/:id', $authenticated(), function ($attachmentId) use ($app) {
+    $attachment = Attachment::find(intval($attachmentId));
+
+    if (!empty($attachment)) {
+        $attachment->load('submission', 'submission.queue');
+
+         // Loop through this user's queue collection and see if this user owns the queue
+         // that this submission belongs to
+        $queueOwnedByThisUser = false;
+        $app->auth->queues->filter(function ($currentqueue) use ($attachment, &$queueOwnedByThisUser) {
+            if ($currentqueue->id_queue == $attachment->submission->queue->id_queue) {
+                $queueOwnedByThisUser = true;
+            }
+        });
+
+        // Check for one of the following conditions before allowing the user to view the attachment
+        // 1. User is an Administrator
+        // 2. User viewing the attachment is the same user that submitted the attachment
+        // 3. User has the ADVISOR or INSTRUCTOR roles and is the owner of the queue for this submission
+        if ($app->auth->hasRole('ADMIN') || ($attachment->submission->id_user == $app->auth->id_user) || ($app->auth->hasRole(['ADVISOR', 'INSTRUCTOR']) && $queueOwnedByThisUser)) {
+            $app->response->headers->set('Content-Description', 'File Transfer');
+            $app->response->headers->set('Content-Type', $attachment->content_type);
+            $app->response->headers->set('Content-Length', $attachment->size);
+            $app->response->headers->set('Content-Disposition', 'attachment; filename='.$attachment->name);
+            $app->response->headers->set('Content-Transfer-Encoding', 'binary');
+            $app->response->setBody(base64_decode($attachment->content));
+        } else {
+            // Redirect to Home if user has no permission to view
+            return $app->response->redirect($app->urlFor('home'));
+        }
+    } else {
+        // Redirect to Home if no valid attachment was found with this id
+
+        return $app->response->redirect($app->urlFor('home'));
+    }
+})->name('home.view.attachment');
+
 $app->get('/submission/create/:id', $authenticated(), function ($queueId) use ($app) {
     $queue = Queue::with('elements', 'queueable')->find(intval($queueId));
 
@@ -102,6 +178,7 @@ $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($a
 
             $attachments[$i] = new Attachment([
                                 'name' => $file['name'],
+                                'size' => $file['size'],
                                 'content_type' => $contenttype,
                                 'content' => base64_encode(file_get_contents($file['tmp_name']))
             ]);
@@ -129,7 +206,7 @@ $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($a
         $submission->attachments()->saveMany($attachments);
     }
 
-    $app->flash('global', 'Submission Submitted');
+    $app->flash('global', $queue->name.' Submitted');
 
     $app->redirect($app->urlFor('home.view.queue', array('id' => $queue->id_queue)));
 })->name('home.view.submission.save');

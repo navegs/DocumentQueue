@@ -37,5 +37,8 @@ return [
     'csrf' => [
         'session' => 'csrf_token',
         'key' => 'csrf_key'
+    ],
+    'uploads' => [
+        'allow' => 'pdf' // Comma delimited list of allowable mime types
     ]
 ];

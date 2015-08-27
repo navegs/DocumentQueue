@@ -43,7 +43,7 @@ class Submission extends Eloquent
     }
 
     /*
-        Define the one-to-many relationship
+        Define the polymorphic one-to-many relationship
      */
     public function comments()
     {

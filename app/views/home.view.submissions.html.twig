@@ -38,7 +38,7 @@
         formatters: {
             "editlink": function(column, row)
             {
-                var url = "#";
+                var url = "{{ urlFor('home.view.submission') }}";
                 return string = "<a href=\"" + url.replace(':id', row['id']) + "\">" + row[column.id] + "</a>";
             }
         }

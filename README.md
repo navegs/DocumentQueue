@@ -15,7 +15,7 @@ Description of application goes here
 * Create database using `/app/sql/documentmanager.sql`
 * Create database user using your preferred method and ensure the user has permissions to the database 
 
-By default, the script creates the `document_manager` database, required tables and the following seed data:
+The `/app/sql/documentmanager.sql` SQL script creates the `document_manager` database, required tables and the following seed data:
 * **Roles:**
   * ADMIN
   * ADVISOR
@@ -58,12 +58,12 @@ Modify the values in these files to fit your specific environment. At a minimum,
 The application allows new users to register. No functionality other than registration is available to guest users. Once registerd, users can authenticate by logging in with their credentials. By default, new users are registered without any special roles. Special roles are ADMIN, INSTRUCTOR, and ADVISOR. These can be assigned by an Administrator when creating a new user or updating an existing user's profile. All users can create submissions to active queues, track their submissions, and create comments for their submissions.
 
 Specialize role functionality includes:
- * ADMIN
- *  * Application wide access and functionality
- *  * Manage Users and Courses
- * INSTRUCTOR
- *  * Manage queues for courses that they are assigned
- *  * Manage all submissions for courses that they are assigned
- * ADVISOR
- *  * Manage personal queues that they create
- *  * Manage all submissions for their personal queue
+* ADMIN
+  * Application wide access and functionality
+  * Manage Users and Courses
+* INSTRUCTOR
+  * Manage queues for courses that they are assigned
+  * Manage all submissions for courses that they are assigned
+* ADVISOR
+  * Manage personal queues that they create
+  * Manage all submissions for their personal queue

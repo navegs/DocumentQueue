@@ -1,0 +1,70 @@
+{% extends 'home.html.twig' %}
+
+{% block title %}View Submission{% endblock %}
+
+{% block homecontent %}
+    <h1 class="page-head-line"><span class="fa fa-list"></span> {{ submission.queue.queueable.name }} {{ submission.queue.name }} Submission</h1>
+    <div class="row">
+        <div class="col-md-8">
+            <form class="form-horizontal" id="createSubmission" role="form" method="post" enctype="multipart/form-data" action="{{ urlFor('home.view.submission.save', {id: queue.id_queue}) }}">
+                <div class="form-group">
+                    <input type="hidden" name="filetotal" id="filetotal" value="{{ queue.elements|length }}" />
+                    <label class="control-label col-sm-4">Submitted By:</label>
+                    <div class="col-sm-8">
+                      <p class="form-control-static">{{ auth.first_name }} {{ auth.last_name }}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Status:</label>
+                    <div class="col-sm-8">
+                      <p class="form-control-static">{{ submission.status }}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Submitted On:</label>
+                    <div class="col-sm-8">
+                      <p class="form-control-static">{{ submission.created_at }}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Last Updated:</label>
+                    <div class="col-sm-8">
+                      <p class="form-control-static">{{ submission.updated_at }}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Attachments:</label>
+                    <div class="col-sm-8">
+                      {% for a in submission.attachments %}
+                      <p class="form-control-static"><a href="{{ urlFor('home.view.attachment', {id: a.id_attachment}) }}" target="_blank">{{ a.name }}</a></p>
+                      {% endfor %}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Comments:</label>
+                    <div class="col-sm-8">
+                      {% for c in submission.comments %}
+                      <p class="form-control-static">{{ c.created_at }}: {{ c.comment }}</p>
+                      {% endfor %}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4" style="padding-top:0px;" for="comment">Add Comment:</label>
+                    <div class="col-sm-8">
+                    <textarea class="form-control" rows="3" name="comment" id="comment" placeholder="Enter comment (optional)"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-7 col-sm-5">
+                        <div class="btn-toolbar pull-right" role="toolbar">
+                            <a href="{{ urlFor('home') }}" role="button" class="btn btn-warning">Cancel</a>
+                            <a href="{{ urlFor('admin.courses') }}" role="button" class="btn btn-danger">Reject</a>
+                            <button type="submit" class="btn btn-success" id="submit">Approve</button>
+                        </div>
+                    </div>                         
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-4"></div>
+    </div>
+{% endblock %}
