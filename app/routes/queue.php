@@ -85,56 +85,75 @@ $app->post('/queue/save/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','A
     $request = $app->request;
 
     $id = intval($id);
-    $doctotal = $request->post('doctotal');
-    $courseid = $request->post('courseid');
-    $name = $request->post('name');
-    $description = $request->post('description');
-    $queueid = $request->post('queueid');
-    $enabled = $request->post('enabled');
+    $doctotal = strip_tags($request->post('doctotal'));
+    $courseid = strip_tags($request->post('courseid'));
+    $name = strip_tags($request->post('name'));
+    $description = strip_tags($request->post('description'));
+    $queueid = strip_tags($request->post('queueid'));
+    $enabled = strip_tags($request->post('enabled'));
     $enabled = isset($enabled) ? true : false;
 
-    /*
-    TODO: Form Validation
-     */
+    $v = $app->validation;
 
-    /*
-        Create an array of QueueElements to add to this queue
-     */
-    if (isset($doctotal) && intval($doctotal)) {
-        $doctotal = intval($doctotal);
-
-        for ($i=0; $i<$doctotal; $i++) {
-            $elementname = $request->post("name$i");
-            $desc = $request->post("description$i");
-            // Require an element name before we add to the array
-            if (!empty($elementname)) {
-                $elements[$i] = new QueueElement([
-                                    'name' => $elementname,
-                                    'description' => $desc
-                ]);
-            }
-        }
-    }
-
-    // Update or create the queue and get reference
-    $queue = Queue::updateOrCreate([
-        'id_queue' => $queueid,
-        'name' => $name,
-        'description' => $description,
-        'is_enabled' => $enabled
+    $v->validate([
+        'doctotal|Document Total' => [$doctotal, 'required'],
+        'courseid|Course ID' => [$courseid, 'required'],
+        'name|Name' => [$name, 'required|max(30)'],
+        'description|Description' => [$description, 'required|max(200)'],
     ]);
 
-    // Associate queue with its owner
-    $queueowner->queues()->save($queue);
+    if ($v->passes()) {
+        //Create an array of QueueElements to add to this queue
+        if (isset($doctotal) && intval($doctotal)) {
+            $doctotal = intval($doctotal);
 
-    // Add queue elements for the new queue
-    if (isset($elements)) {
-        $queue->elements()->saveMany($elements);
+            for ($i=0; $i<$doctotal; $i++) {
+                $elementname = strip_tags($request->post("name$i"));
+                $desc = strip_tags($request->post("description$i"));
+
+                $vAttach = $app->validation;
+
+                $vAttach->validate([
+                    'elementname|Element Name' => [$elementname, 'required'],
+                ]);
+
+                if ($vAttach->passes()) {
+                    if (!empty($elementname)) {
+                        $elements[$i] = new QueueElement([
+                                            'name' => $elementname,
+                                            'description' => $desc
+                        ]);
+                    }
+                }
+            }
+        }
+
+        // Update or create the queue and get reference
+        $queue = Queue::updateOrCreate([
+            'id_queue' => $queueid,
+            'name' => $name,
+            'description' => $description,
+            'is_enabled' => $enabled
+        ]);
+
+        // Associate queue with its owner
+        $queueowner->queues()->save($queue);
+
+        // Add queue elements for the new queue
+        if (isset($elements)) {
+            $queue->elements()->saveMany($elements);
+        }
+
+        $app->flash('global', 'Queue Saved');
+
+        return $app->response->redirect($app->urlFor('home'));
+  
     }
+    else {
+        $app->flash('global', 'Name is Required');
 
-    $app->flash('global', 'Queue Saved');
-
-    return $app->response->redirect($app->urlFor('home'));
+        $app->redirect($app->urlFor('addqueue', array('type'=> 'user', 'id' => $id)));
+    }
 })->name('savequeue');
 
 $app->get('/queue/view/:id', $authenticated(), function ($id) use ($app) {
@@ -176,6 +195,7 @@ $app->get('/queue/view/:id', $authenticated(), function ($id) use ($app) {
 
     $app->render('home.view.queue.html.twig', [
         'queue' => $queue,
+        'errors' => $v->errors(),
         'userqueues' => $userQueues,
         'mycourses' => $mycourses,
         'submissions' => $submissions
