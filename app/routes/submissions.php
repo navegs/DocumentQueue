@@ -19,6 +19,12 @@ $app->get('/submissions', $authenticated(), function () use ($app) {
 })->name('home.view.submissions');
 
 $app->get('/submission/:id', $authenticated(), function ($subId) use ($app) {
+    if (!isset($subId) || !is_numeric($subId)) {
+            $app->flash('global', 'Submission id invalid or not provided!');
+
+            $app->redirect($app->urlFor('home'));
+    }
+
     $submission = Submission::find(intval($subId));
 
     if (!empty($submission)) {
@@ -58,6 +64,12 @@ $app->get('/submission/:id', $authenticated(), function ($subId) use ($app) {
 })->name('home.view.submission');
 
 $app->get('/attachment/:id', $authenticated(), function ($attachmentId) use ($app) {
+    if (!isset($attachmentId) || !is_numeric($attachmentId)) {
+            $app->flash('global', 'Attachment id invalid or not provided!');
+
+            $app->redirect($app->urlFor('home'));
+    }
+
     $attachment = Attachment::find(intval($attachmentId));
 
     if (!empty($attachment)) {
@@ -95,6 +107,12 @@ $app->get('/attachment/:id', $authenticated(), function ($attachmentId) use ($ap
 })->name('home.view.attachment');
 
 $app->get('/submission/create/:id', $authenticated(), function ($queueId) use ($app) {
+    if (!is_numeric($queueId)) {
+        $app->flash('global', 'Invalid Queue Id');
+
+        return $app->response->redirect($app->urlFor('home'));
+    }
+
     $queue = Queue::with('elements', 'queueable')->find(intval($queueId));
 
     $app->render('home.view.createSubmission.html.twig', [
@@ -103,8 +121,8 @@ $app->get('/submission/create/:id', $authenticated(), function ($queueId) use ($
 })->name('home.view.submission.create');
 
 $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($app) {
-    if (!isset($queueId)) {
-            $app->flash('global', 'Submission queue id not provided!');
+    if (!isset($queueId) || !is_numeric($queueId)) {
+            $app->flash('global', 'Submission queue id invalid or not provided!');
 
             $app->redirect($app->urlFor('home'));
     }
@@ -200,7 +218,7 @@ $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($a
                                         'created_at' => $submission->created_at
         ]));
     }
-//var_dump($submission->freshTimestamp());
+
     // Add attachments for the new submission
     if (isset($attachments)) {
         $submission->attachments()->saveMany($attachments);

@@ -148,15 +148,28 @@ $app->post('/queue/save/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','A
 
         return $app->response->redirect($app->urlFor('home'));
   
-    }
-    else {
-        $app->flash('global', 'Name is Required');
+    } else {
+        // Set the course variable to pass into the view if this was to
+        // create a course queue.
+        $course = ($type == 'course') ? $queueowner : null;
 
-        $app->redirect($app->urlFor('addqueue', array('type'=> 'user', 'id' => $id)));
+        $app->render('addqueue.html.twig', [
+            "errors" => $v->errors(),
+            "request" => $request,
+            "type" => $type,
+            "id" => $id,
+            "course" => $course
+        ]);
     }
 })->name('savequeue');
 
 $app->get('/queue/view/:id', $authenticated(), function ($id) use ($app) {
+    if (!is_numeric($id)) {
+        $app->flash('global', 'Invalid Queue Id');
+
+        return $app->response->redirect($app->urlFor('home'));
+    }
+
     // List of the current user's' queues
     $userQueues = $app->auth->queues->sortBy('name');
     // List of courses that the current users owns
@@ -195,7 +208,6 @@ $app->get('/queue/view/:id', $authenticated(), function ($id) use ($app) {
 
     $app->render('home.view.queue.html.twig', [
         'queue' => $queue,
-        'errors' => $v->errors(),
         'userqueues' => $userQueues,
         'mycourses' => $mycourses,
         'submissions' => $submissions

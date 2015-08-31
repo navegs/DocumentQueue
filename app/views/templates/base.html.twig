@@ -30,32 +30,12 @@
                     <img src="images/Stevens-Logo-Preview.png" alt="Stevens Logo" />
                 </a>
             </div>
-            {% if auth %}
-            <div class="text-right">
-                <div class="user-settings-wrapper">
-                    <ul class="nav">
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
-                                <span class="glyphicon glyphicon-user" style="font-size: 25px;"></span>
-                            </a>
-                            <div class="dropdown-menu dropdown-settings">
-                                <h4 class="media-heading">{{ auth.first_name }} {{ auth.last_name }}</h4>
-                                <hr />
-                                <h5><strong>Major : </strong>
-                                {{ auth.major }}</h5>
-                                {% if auth.advisor.first_name %}
-                                <h5><strong>Advisor : </strong>
-                                {{ auth.advisor.first_name }} {{ auth.advisor.last_name }}</h5>
-                                {% endif %}
-                                <hr />
-                                <a href="#" class="btn btn-info btn-sm">Profile</a>&nbsp; <a href="{{ urlFor('logout') }}" class="btn btn-danger btn-sm">Logout</a>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            {% endif %}
         </div>
+        {% if auth %}
+        <div class="text-right">
+            Logged In: {{ auth.first_name}} {{auth.last_name}}
+        </div>
+        {% endif %}
     </div>
     <!-- HEADER END-->
     <nav>{% include 'templates/partials/nav.html.twig' %}</nav>

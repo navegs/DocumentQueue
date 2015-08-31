@@ -67,7 +67,7 @@ $app->container->singleton('hash', function () use ($app) {
 // Make the custom Validator helper class availabe within the Slim container
 // Used for validation
 $app->container->singleton('validation', function () use ($app) {
-    return new Validator;
+    return new Validator($app->user);
 });
 
 // Make the custom PHPMailer helper class availabe within the Slim container

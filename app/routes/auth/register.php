@@ -28,7 +28,7 @@ $app->post('/register', $guest(), function () use ($app) {
     $v = $app->validation;
     
     $v->validate([
-        'email|Email' => [$email, 'required|email|max(30)'],
+        'email|Email' => [$email, 'required|email|max(30)|uniqueEmail'],
         'firstname|First Name' => [$firstname, 'required|max(30)'],
         'lastname|Last Name' => [$lastname, 'required|max(30)'],
         'major|Major' => [$major, 'required|max(100)'],

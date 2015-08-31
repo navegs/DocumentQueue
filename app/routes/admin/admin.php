@@ -66,6 +66,12 @@ $app->get('/admin/user/new', $authorizationCheck(['ADMIN']), function () use ($a
     Name: admin.editUser
  */
 $app->get('/admin/user/:id', $authorizationCheck(['ADMIN']), function ($userId) use ($app) {
+    if (!isset($userId) || !is_numeric($userId)) {
+            $app->flash('global', 'User Id invalid or not provided!');
+
+            $app->redirect($app->urlFor('admin.users'));
+    }
+
     // Retrieve the user's record
     $user = User::where('id_user', $userId)->first()->load('roles');
     if (isset($user)) {
@@ -243,6 +249,12 @@ $app->get('/admin/course/new', $authorizationCheck(['ADMIN']), function () use (
     Name: admin.editCourse
  */
 $app->get('/admin/course/:id', $authorizationCheck(['ADMIN']), function ($courseId) use ($app) {
+    if (!isset($courseId) || !is_numeric($courseId)) {
+            $app->flash('global', 'Course Id invalid or not provided!');
+
+            $app->redirect($app->urlFor('admin.courses'));
+    }
+
     // Retrieve the user's record
     $course = Course::where('id_course', $courseId)->first()->load('coordinator');
     if (isset($course)) {
