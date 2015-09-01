@@ -28,7 +28,10 @@ $app->get('/submission/:id', $authenticated(), function ($subId) use ($app) {
     $submission = Submission::find(intval($subId));
 
     if (!empty($submission)) {
-        $submission->load('user', 'queue', 'queue.queueable', 'attachments', 'comments');
+        $submission->load('user', 'queue', 'queue.queueable', 'attachments', 'comments', 'comments.user');
+        $submission->comments = $submission->comments->sortBy(function ($comment) {
+            return $comment->created_at;
+        })->reverse();
 
          // Loop through this user's queue collection and see if this user owns the queue
          // that this submission belongs to
@@ -39,16 +42,20 @@ $app->get('/submission/:id', $authenticated(), function ($subId) use ($app) {
             }
         });
 
-        if ($app->auth->hasRole('ADMIN') || ($submission->user->id_user == $app->auth->id_user) || ($app->auth->hasRole(['ADVISOR', 'INSTRUCTOR']) && $queueOwnedByThisUser)) {
+        $submissionOwnedByThisUser = ($submission->user->id_user == $app->auth->id_user) ? true : false;
+
+        if ($app->auth->hasRole('ADMIN') || $submissionOwnedByThisUser || ($app->auth->hasRole(['ADVISOR', 'INSTRUCTOR']) && $queueOwnedByThisUser)) {
             // List of the current user's' queues
-            $userQueues = $app->auth->queues->sortBy('name');
+            $userQueues = $app->auth->queues->sortBy('name', $descending = true);
             // List of courses that the current users owns
             $mycourses = Course::where('id_coordinator', $app->auth->id_user)->with('queues')->get()->sortBy('name');
 
             $app->render('home.view.submission.html.twig', [
                 'userqueues' => $userQueues,
                 'mycourses' => $mycourses,
-                'submission' => $submission
+                'submission' => $submission,
+                'queueOwnedByThisUser' => $queueOwnedByThisUser,
+                'submissionOwnedByThisUser' => $submissionOwnedByThisUser
             ]);
         } else {
             // Redirect to Home if user has no permission to view this submission
@@ -120,6 +127,29 @@ $app->get('/submission/create/:id', $authenticated(), function ($queueId) use ($
     ]);
 })->name('home.view.submission.create');
 
+$app->post('/submission/addcomment/:id', $authenticated(), function ($subId) use ($app) {
+    if (!isset($subId) || !is_numeric($subId)) {
+        $app->flash('global', 'Invalid Submission Id');
+
+        return $app->response->redirect($app->urlFor('home'));
+    }
+
+    $request = $app->request;
+    $comment = trim(strip_tags($request->post('comment')));
+
+    if (!empty($comment) && (strlen($comment) <= 200)) {
+        $submission = Submission::find(intval($subId));
+        $submission->comments()->save(new Comment([
+                                    'comment' => $comment,
+                                    'id_user' => $app->auth->id_user,
+                                    'created_at' => date('Y-m-d G:i:s')
+        ]));
+    }
+
+    $app->response->redirect($app->urlFor('home.view.submission', array('id' => $subId)));
+    
+})->name('submission.addcomment');
+
 $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($app) {
     if (!isset($queueId) || !is_numeric($queueId)) {
             $app->flash('global', 'Submission queue id invalid or not provided!');
@@ -146,8 +176,8 @@ $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($a
     }
 
     $request = $app->request;
-    $filetotal = $request->post('filetotal');
-    $comment = $request->post('comment');
+    $filetotal = strip_tags($request->post('filetotal'));
+    $comment = strip_tags($request->post('comment'));
 
     /*
         Used to check for errors and provide useful descriptions in case a file upload fails.

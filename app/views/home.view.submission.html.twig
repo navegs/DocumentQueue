@@ -23,13 +23,13 @@
                 <div class="form-group">
                     <label class="control-label col-sm-4">Submitted On:</label>
                     <div class="col-sm-8">
-                      <p class="form-control-static">{{ submission.created_at }}</p>
+                      <p class="form-control-static">{{ submission.created_at|date('M d, Y g:i:s A') }}</p>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-4">Last Updated:</label>
                     <div class="col-sm-8">
-                      <p class="form-control-static">{{ submission.updated_at }}</p>
+                      <p class="form-control-static">{{ submission.updated_at|date('M d, Y g:i:s A') }}</p>
                     </div>
                 </div>
                 <div class="form-group">
@@ -41,25 +41,14 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-4">Comments:</label>
-                    <div class="col-sm-8">
-                      {% for c in submission.comments %}
-                      <p class="form-control-static">{{ c.created_at }}: {{ c.comment }}</p>
-                      {% endfor %}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-4" style="padding-top:0px;" for="comment">Add Comment:</label>
-                    <div class="col-sm-8">
-                    <textarea class="form-control" rows="3" name="comment" id="comment" placeholder="Enter comment (optional)"></textarea>
-                    </div>
-                </div>
-                <div class="form-group">
                     <div class="col-sm-offset-7 col-sm-5">
                         <div class="btn-toolbar pull-right" role="toolbar">
                             <a href="{{ urlFor('home') }}" role="button" class="btn btn-warning">Cancel</a>
+                            <a href="{{ urlFor('home') }}" role="button" class="btn btn-success">Save</a>
+                            {% if queueOwnedByThisUser %}
                             <a href="{{ urlFor('admin.courses') }}" role="button" class="btn btn-danger">Reject</a>
                             <button type="submit" class="btn btn-success" id="submit">Approve</button>
+                            {% endif %}
                         </div>
                     </div>                         
                 </div>
@@ -67,4 +56,35 @@
         </div>
         <div class="col-sm-4"></div>
     </div>
+    <div class="row">
+        <div class="col-sm-8">
+            <p class="page-head-line">Comments</p>
+            <form id="addComment" role="form" method="post" action="{{ urlFor('submission.addcomment', {id: submission.id_submission}) }}">
+                <div class="col-sm-11">
+                <textarea class="form-control" rows="3" name="comment" id="comment" placeholder="Enter comment" maxlength="200"></textarea>
+                </div>
+                <div class="col-sm-1">
+                    <button type="submit" class="btn btn-info" id="submit">Add</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-4"></div>
+    </div>
+    <div class="row"><div class="col-sm-8"><hr></div><div class="col-sm-4"></div></div>
+    {% for c in submission.comments %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">{{ c.user.first_name }} {{ c.user.last_name }}
+                        <span class="small pull-right">{{ c.created_at|date('M d, Y g:i:s A') }}</span>
+                    </h4>
+                    <p>{{ c.comment }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+    <div class="row"><div class="col-sm-8"><hr></div><div class="col-sm-4"></div></div>
+    {% endfor %}
 {% endblock %}
