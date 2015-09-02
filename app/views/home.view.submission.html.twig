@@ -39,13 +39,13 @@
                       {% endfor %}
                     </div>
                 </div>
-                {% if queueOwnedByThisUser %}
-                <form class="form-horizontal" id="createSubmission" role="form" method="post" enctype="multipart/form-data" action="{{ urlFor('home.view.submission.save', {id: queue.id_queue}) }}">
+                {% if queueOwnedByThisUser and reviewable %}
+                <form class="form-horizontal" id="createSubmission" role="form" method="post" action="">
                 <div class="form-group">
                     <div class="col-sm-offset-7 col-sm-5">
                         <div class="btn-toolbar pull-right" role="toolbar">
-                            <a href="{{ urlFor('admin.courses') }}" role="button" class="btn btn-danger">Reject</a>
-                            <button type="submit" class="btn btn-success" id="submit">Approve</button>
+                            <button type="button" class="btn btn-danger" id="rejectBtn">Reject</button>
+                            <button type="button" class="btn btn-success" id="approveBtn">Approve</button>
                         </div>
                     </div>                         
                 </div>
@@ -117,4 +117,22 @@
     </div>
     <div class="row"><div class="col-sm-8"><hr></div><div class="col-sm-4"></div></div>
     {% endfor %}
+{% endblock %}
+{% block script %}
+{% if queueOwnedByThisUser and reviewable %}
+<script>
+    $('#rejectBtn').click(function () {
+        var url = "{{ urlFor ('submission.action') }}";
+        url = url.replace(':id', '{{ submission.id_submission }}');
+        url = url.replace(':action', 'reject');
+        post(url);
+    });
+    $('#approveBtn').click(function () {
+        var url = "{{ urlFor ('submission.action') }}";
+        url = url.replace(':id', '{{ submission.id_submission }}');
+        url = url.replace(':action', 'approve');
+        post(url);
+    });
+</script>
+{% endif %}
 {% endblock %}

@@ -42,6 +42,7 @@ $app->get('/submission/:id', $authenticated(), function ($subId) use ($app) {
             }
         });
 
+        $reviewable = ($submission->status == Submission::STATUS_AWAITING_REVIEW) ? true : false;
         $submissionOwnedByThisUser = ($submission->user->id_user == $app->auth->id_user) ? true : false;
 
         if ($app->auth->hasRole('ADMIN') || $submissionOwnedByThisUser || ($app->auth->hasRole(['ADVISOR', 'INSTRUCTOR']) && $queueOwnedByThisUser)) {
@@ -54,6 +55,7 @@ $app->get('/submission/:id', $authenticated(), function ($subId) use ($app) {
                 'userqueues' => $userQueues,
                 'mycourses' => $mycourses,
                 'submission' => $submission,
+                'reviewable' => $reviewable,
                 'queueOwnedByThisUser' => $queueOwnedByThisUser,
                 'submissionOwnedByThisUser' => $submissionOwnedByThisUser
             ]);
@@ -163,6 +165,49 @@ $app->post('/submission/addcomment/:id', $authenticated(), function ($subId) use
     $app->response->redirect($app->urlFor('home.view.submission', array('id' => $subId)));
     
 })->name('submission.addcomment');
+
+$app->post('/submission/:action/:id', $authenticated(), function ($action, $subId) use ($app) {
+    if (!isset($subId) || !is_numeric($subId)) {
+        $app->flash('global', 'Invalid Submission Id');
+
+        return $app->response->redirect($app->urlFor('home'));
+    }
+    if ((!isset($action) || empty($action)) || ($action != 'approve' && $action != 'reject')) {
+        $app->flash('global', 'Invalid Submission Action');
+
+        return $app->response->redirect($app->urlFor('home.view.submission', array('id' => $subId)));
+    }
+
+    $submission = Submission::find(intval($subId))->load('user', 'queue', 'queue.queueable');
+
+    switch ($action) {
+        case 'approve':
+            $submission->status = Submission::STATUS_APPROVED;
+            break;
+        
+        case 'reject':
+            $submission->status = Submission::STATUS_REJECTED;
+            break;
+    }
+
+    $submission->save();
+        
+    // If the user perfoming this action is not the submission creator
+    // Notify submission creator of action
+    if ($app->auth->id_user != $submission->id_user) {
+        $app->mail->send(
+            'email/submissionaction.html.twig',
+            ['user' => $app->auth, 'submission' => $submission],
+            function ($message) use ($submission) {
+                $message->to($submission->user->email);
+                $message->subject($submission->status.': '.$submission->queue->name.' - '.$submission->queue->queueable->name);
+            }
+        );
+    }
+
+    $app->response->redirect($app->urlFor('home.view.submission', array('id' => $subId)));
+    
+})->name('submission.action');
 
 $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($app) {
     if (!isset($queueId) || !is_numeric($queueId)) {
