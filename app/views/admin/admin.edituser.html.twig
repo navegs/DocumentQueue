@@ -12,66 +12,124 @@
     <div class="row">
         <div class="col-md-8">
             <form class="form-horizontal" id="addUserForm" role="form" method="post" action="{{ urlFor('admin.saveUser') }}">
-                <div class="form-group">
-                    <input type="hidden" name="userId" id="userId" value="{{ user.id_user }}" />
-                    <label class="control-label col-sm-4" style="padding-top:0px;" for="email">Email</label>
-                    <div class="col-sm-8">
-                    <input type="text" class="form-control" name="email" id="email" placeholder="Enter email" value="{{ user.email }}">
+                <input type="hidden" name="userId" id="userId" value="{{ user.id_user }}">
+                <div class="form-group row{% if errors.first('email') %} has-error has-feedback{% endif %}">
+                    <label class="control-label col-sm-2" for="email">Email:</label>
+                    <div class="col-sm-5">
+                    <input disabled type="text" class="form-control" name="email" id="email" placeholder="Enter email"{% if request.post('email') %} value="{{ request.post('email') }}"{% else %} value="{{ user.email }}"{% endif %}>
+                    </div>
+                    <div class="col-sm-5">
+                        {% if errors.first('email') %}
+                        <span class="help-block">{{ errors.first('email') }}</span>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-4" style="padding-top:0px;" for="firstname">First Name</label>
-                    <div class="col-sm-8">
-                    <input type="text" class="form-control" name="firstname" id="firstname" placeholder="Enter first name" value="{{ user.first_name }}">
+                <div class="form-group row{% if errors.first('firstname') %} has-error has-feedback{% endif %}">
+                    <label class="control-label col-sm-2" for="firstname">First Name:</label>
+                    <div class="col-sm-5">
+                    <input type="text" class="form-control" name="firstname" id="firstname" placeholder="Enter first name"{% if request.post('firstname') %} value="{{ request.post('firstname') }}"{% else %} value="{{ user.first_name }}"{% endif %}>
+                    </div>
+                    <div class="col-sm-5">
+                        {% if errors.first('firstname') %}
+                        <span class="help-block">{{ errors.first('firstname') }}</span>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-4" style="padding-top:0px;" for="lastname">Last Name</label>
-                    <div class="col-sm-8">
-                    <input type="text" class="form-control" name="lastname" id="lastname" placeholder="Enter last name" value="{{ user.last_name }}">
+                <div class="form-group row{% if errors.first('lastname') %} has-error has-feedback{% endif %}">
+                    <label class="control-label col-sm-2" for="lastname">Last Name:</label>
+                    <div class="col-sm-5">
+                    <input type="text" class="form-control" name="lastname" id="lastname" placeholder="Enter last name"{% if request.post('lastname') %} value="{{ request.post('lastname') }}"{% else %} value="{{ user.last_name }}"{% endif %}>
+                    </div>
+                    <div class="col-sm-5">
+                        {% if errors.first('lastname') %}
+                        <span class="help-block">{{ errors.first('lastname') }}</span>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-4" style="padding-top:0px;" for="major">Major</label>
-                    <div class="col-sm-8">
-                    <input type="text" class="form-control" name="major" id="major" placeholder="Enter major" value="{{ user.major }}">
+                <div class="form-group row{% if errors.first('major') %} has-error has-feedback{% endif %}">
+                    <label class="control-label col-sm-2" for="major">Major:</label>
+                    <div class="col-sm-5">
+                    <input type="text" class="form-control" name="major" id="major" placeholder="Enter major"{% if request.post('major') %} value="{{ request.post('major') }}"{% else %} value="{{ user.major }}"{% endif %}>
+                    </div>
+                    <div class="col-sm-5">
+                        {% if errors.first('major') %}
+                        <span class="help-block">{{ errors.first('major') }}</span>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-4"  style="padding-top:0px;" for="password">Password</label>
-                    <div class="col-sm-8">
-                    <input type="password" class="form-control" name="password" id="password" placeholder="Enter password">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-4" style="padding-top:0px;" for="confirmpassword">Confirm Password</label>
-                    <div class="col-sm-8">
-                    <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" placeholder="Confirm password">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-4" style="padding-top:0px;" for="advisor">Advisor</label>
-                    <div class="col-sm-3">
+                <div class="form-group row{% if errors.first('advisor') %} has-error has-feedback{% endif %}">
+                    <label class="control-label col-sm-2" for="advisor">Advisor:</label>
+                    <div class="col-sm-5">
                     <select name="advisor" class="form-control" id="advisor">
                         <option value="">None</option>
                         {% for advisor in advisors %}
-                        <option value="{{ advisor.id_user }}"{% if user.advisor.id_user == advisor.id_user %} selected{% endif %}>{{ advisor.last_name }}, {{ advisor.first_name }}</option>
+                        <option value="{{ advisor.id_user }}"{% if user.advisor.id_user == advisor.id_user or request.post('advisor') == advisor.id_user %} selected{% endif %}>{{ advisor.last_name }}, {{ advisor.first_name }}</option>
                         {% endfor %}
                     </select>
                     </div>
-                    <label class="control-label col-sm-2" style="padding-top:0px;" for="roles">Roles</label>
-                    <div class="col-sm-3">
+                    <div class="col-sm-5">
+                        {% if errors.first('advisor') %}
+                        <span class="help-block">{{ errors.first('advisor') }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-2" for="roles">Roles:</label>
+                    <div class="col-sm-5">
                     <select name="roles[]" class="form-control" id="roles" size="3" multiple="">
                         {% for role in roles %}
                         <option value="{{ role.id_role }}"{{ user.hasRole(role.name) ? ' selected' : '' }}>{{ role.name }}</option>
                         {% endfor %}
                     </select>
                     </div>
+                    <div class="col-sm-5"></div>
                 </div>                    
                 <div class="form-group">
-                    <div class="col-sm-offset-9 col-sm-3">
+                    <div class="col-sm-offset-4 col-sm-3">
                         <div class="btn-toolbar pull-right" role="toolbar">
                             <a href="{{ urlFor('admin.users') }}" role="button" class="btn btn-danger">Cancel</a>
+                            <button type="submit" class="btn btn-success" id="submit">Save</button>
+                        </div>
+                    </div>                         
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-4"></div>
+    </div>
+     <div class="row">
+        <div class="col-md-12">
+            <h1 class="page-head-line"><span class="fa fa-key fa-fw"></span> Reset Password</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-8">
+            <form class="form-horizontal" id="resetPassword" name="resetPassword" role="form" method="post" action="{{ urlFor('admin.resetPassword') }}">
+            <input type="hidden" name="userId" id="userId" value="{{ user.id_user }}">
+                <div class="form-group row{% if errors.first('password') %} has-error has-feedback{% endif %}">
+                    <label class="control-label col-sm-3" for="password">Password:</label>
+                    <div class="col-sm-5">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Enter password">
+                    </div>
+                    <div class="col-sm-4">
+                        {% if errors.first('password') %}
+                        <span class="help-block">{{ errors.first('password') }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group row{% if errors.first('password_confirm') %} has-error has-feedback{% endif %}">
+                    <label class="control-label col-sm-3" for="password_confirm">Confirm Password:</label>
+                    <div class="col-sm-5">
+                    <input type="password" class="form-control" name="password_confirm" id="password_confirm" placeholder="Confirm password">
+                    </div>
+                    <div class="col-sm-4">
+                        {% if errors.first('password_confirm') %}
+                        <span class="help-block">{{ errors.first('password_confirm') }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-4">
+                        <div class="btn-toolbar pull-right" role="toolbar">
                             <button type="submit" class="btn btn-success" id="submit">Save</button>
                         </div>
                     </div>                         

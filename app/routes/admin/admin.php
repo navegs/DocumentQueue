@@ -110,49 +110,217 @@ $app->post('/admin/user/save', $authorizationCheck(['ADMIN']), function () use (
 
     $request = $app->request;
 
-    $userId = $request->post('userId');
-    $email = $request->post('email');
-    $firstname = $request->post('firstname');
-    $lastname = $request->post('lastname');
-    $major = $request->post('major');
-    $password = $request->post('password');
-    $passwordConfirm = $request->post('confirmpassword');
-    $advisor = $request->post('advisor');
+    $userId = strip_tags(trim($request->post('userId')));
+    $email = strip_tags(trim($request->post('email')));
+    $firstname = strip_tags(trim($request->post('firstname')));
+    $lastname = strip_tags(trim($request->post('lastname')));
+    $major = strip_tags(trim($request->post('major')));
+    $password = strip_tags(trim($request->post('password')));
+    $passwordConfirm = strip_tags(trim($request->post('password_confirm')));
+    $advisor = strip_tags(trim($request->post('advisor')));
     $roles = $request->post('roles');
 
-    /*
-    TODO: Form Validation & Check for duplicate email
-     */
-
-    $user = User::updateOrCreate([
-        'id_user' => $userId,
-        'email' => $email,
-        'first_name' => $firstname,
-        'last_name' => $lastname,
-        'major' => $major,
-        'id_advisor' => $advisor,
-        'password' => $app->hash->password($password)
-    ]);
-
-    $app->flash('global', 'User Saved');
-
-    // Remove any existing roles
-    $user->roles()->detach();
-
-    // Add user roles if provided
-    if (isset($roles) && count($roles)) {
-        // Convert the array of strings from the roles post variable to an array of ints
-        $rolesArray = [];
-        for ($i=0; $i<count($roles); $i++) {
-            $rolesArray[$i] = intval($roles[$i]);
+    $v = $app->validation;
+    
+    if (!empty($userId)) {
+        // User Id provided, so we are updating an existing user
+        // Ensure user id is valide or redirect user
+        $user = User::where('id_user', $userId)->first();
+        
+        if (empty($user)) {
+            // No user was found with this id, redirect to admin users page
+            $app->flash('global', 'Invalid User Id');
+            return $app->response->redirect($app->urlFor('admin.users'));
         }
 
-        // Add the new roles
-        $user->roles()->attach($rolesArray);
+        // No need to check for email and password fields
+        $v->validate([
+            'firstname|First Name' => [$firstname, 'required|max(30)'],
+            'lastname|Last Name' => [$lastname, 'required|max(30)'],
+            'major|Major' => [$major, 'required|max(100)'],
+            'advisor|Advisor' => [$advisor, 'required'],
+        ]);
+
+        if ($v->passes()) {
+            $user->update([
+                'id_user' => $userId,
+                'first_name' => $firstname,
+                'last_name' => $lastname,
+                'major' => $major,
+                'id_advisor' => $advisor
+            ]);
+
+            // Remove any existing roles
+            $user->roles()->detach();
+
+            // Add user roles if provided
+            if (isset($roles) && count($roles)) {
+                // Convert the array of strings from the roles post variable to an array of ints
+                $rolesArray = [];
+                for ($i=0; $i<count($roles); $i++) {
+                    $rolesArray[$i] = intval($roles[$i]);
+                }
+
+                // Add the new roles
+                $user->roles()->attach($rolesArray);
+            }
+
+            $app->flash('global', 'User Info Saved');
+            return $app->response->redirect($app->urlFor('admin.editUser', array('id' => $user->id_user)));
+        } else {
+            // Update User Validation Failed
+            //
+            // Retrieve a collection of users that have the 'ADVISOR'
+            // role. This will be passed into the view so users can select
+            // a valid advisor when registering.
+            $advisors = $app->user->whereHas('roles', function ($q) {
+                $q->where('name', '=', 'ADVISOR');
+            })->get()->sortBy('last_name');
+
+            // Retrieve a collection of all roles
+            $roles = Role::all()->toArray();
+
+            $user = User::where('id_user', $userId)->first()->load('roles', 'advisor');
+
+            $app->render('admin/admin.edituser.html.twig', [
+                    'errors' => $v->errors(),
+                    'request' => $request,
+                    'user' => $user,
+                    'roles' => $roles,
+                    'advisors' => $advisors
+            ]);
+        }
+    } else {
+        // No user id provided, so this is a new user
+        // Validate everything and create user
+        $v->validate([
+            'email|Email' => [$email, 'required|email|max(30)|uniqueEmail'],
+            'firstname|First Name' => [$firstname, 'required|max(30)'],
+            'lastname|Last Name' => [$lastname, 'required|max(30)'],
+            'major|Major' => [$major, 'required|max(100)'],
+            'advisor|Advisor' => [$advisor, 'required'],
+            'password|Password' => [$password, 'required|min(6)'],
+            'password_confirm|Password Confirmation' => [$passwordConfirm, 'required|matches(password)'],
+        ]);
+
+        if ($v->passes()) {
+            $user = User::create([
+                'email' => $email,
+                'first_name' => $firstname,
+                'last_name' => $lastname,
+                'major' => $major,
+                'id_advisor' => $advisor,
+                'password' => $app->hash->password($password)
+            ]);
+
+            // Remove any existing roles
+            $user->roles()->detach();
+
+            // Add user roles if provided
+            if (isset($roles) && count($roles)) {
+                // Convert the array of strings from the roles post variable to an array of ints
+                $rolesArray = [];
+                for ($i=0; $i<count($roles); $i++) {
+                    $rolesArray[$i] = intval($roles[$i]);
+                }
+
+                // Add the new roles
+                $user->roles()->attach($rolesArray);
+            }
+            
+            $app->flash('global', 'User Info Saved');
+            return $app->response->redirect($app->urlFor('admin.editUser', array('id' => $user->id_user)));
+        } else {
+            // New user validation failed
+            //
+            // Retrieve a collection of users that have the 'ADVISOR'
+            // role. This will be passed into the view so users can select
+            // a valid advisor when registering.
+            $advisors = $app->user->whereHas('roles', function ($q) {
+                $q->where('name', '=', 'ADVISOR');
+            })->get()->sortBy('last_name');
+
+            // Retrieve a collection of all roles
+            $roles = Role::all()->toArray();
+
+            if (!empty($userId)) {
+                $user = User::where('id_user', $userId)->first()->load('roles', 'advisor');
+
+                $app->render('admin/admin.edituser.html.twig', [
+                        'errors' => $v->errors(),
+                        'request' => $request,
+                        'user' => $user,
+                        'roles' => $roles,
+                        'advisors' => $advisors
+                    ]);
+            } else {
+                $app->render('admin/admin.newuser.html.twig', [
+                    'errors' => $v->errors(),
+                    'request' => $request,
+                    'roles' => $roles,
+                    'advisors' => $advisors
+                ]);
+            }
+        }
+    }
+})->name('admin.saveUser');
+
+/*
+    Route: Admin Reset Password
+    Name: admin.resetPassword
+ */
+$app->post('/admin/user/resetpassword', $authorizationCheck(['ADMIN']), function () use ($app) {
+    $request = $app->request;
+
+    $userId = strip_tags(trim($request->post('userId')));
+    $password = strip_tags(trim($request->post('password')));
+    $passwordConfirm = strip_tags(trim($request->post('password_confirm')));
+
+    if (!isset($userId) || !is_numeric($userId)) {
+            $app->flash('global', 'User Id invalid or not provided!');
+
+            $app->redirect($app->urlFor('admin.users'));
     }
 
-    return $app->response->redirect($app->urlFor('admin.users'));
-})->name('admin.saveUser');
+    $v = $app->validation;
+    
+    $v->validate([
+        'password|Password' => [$password, 'required|min(6)'],
+        'password_confirm|Password Confirmation' => [$passwordConfirm, 'required|matches(password)'],
+    ]);
+
+    if ($v->passes()) {
+        $user = User::updateOrCreate([
+            'id_user' => $userId,
+            'password' => $app->hash->password($password)
+        ]);
+
+        $app->flash('global', 'User Password Saved');
+
+        return $app->response->redirect($app->urlFor('admin.editUser', array('id' => $userId)));
+    } else {
+        // Retrieve a collection of users that have the 'ADVISOR'
+        // role. This will be passed into the view so users can select
+        // a valid advisor when registering.
+        $advisors = $app->user->whereHas('roles', function ($q) {
+            $q->where('name', '=', 'ADVISOR');
+        })->get()->sortBy('last_name');
+
+        // Retrieve a collection of all roles
+        $roles = Role::all()->toArray();
+
+        $user = User::where('id_user', $userId)->first()->load('roles', 'advisor');
+
+        $app->render('admin/admin.edituser.html.twig', [
+                        'errors' => $v->errors(),
+                        'request' => $request,
+                        'user' => $user,
+                        'roles' => $roles,
+                        'advisors' => $advisors
+        ]);
+    }
+    
+})->name('admin.resetPassword');
 
 /*
     Route: Admin Delete User(s)
