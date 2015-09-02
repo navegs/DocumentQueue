@@ -204,6 +204,7 @@ DROP TABLE IF EXISTS `submission_attachments`;
 CREATE TABLE IF NOT EXISTS `submission_attachments` (
   `id_attachment` int(10) unsigned NOT NULL,
   `id_submission` int(10) unsigned NOT NULL,
+  `id_element` int(10) unsigned NOT NULL,
   `name` varchar(30) NOT NULL,
   `size` int(10) NOT NULL,
   `content_type` varchar(20) NOT NULL,

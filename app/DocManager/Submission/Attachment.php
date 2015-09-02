@@ -13,6 +13,7 @@ class Attachment extends Eloquent
 
     protected $fillable = [
         'id_submission',
+        'id_element',
         'name',
         'size',
         'content_type',
@@ -28,5 +29,11 @@ class Attachment extends Eloquent
     public function submission()
     {
         return $this->belongsTo('DocManager\Submission\Submission', 'id_submission', 'id_submission');
+    }
+
+    // Queue element that this attachment is related to
+    public function element()
+    {
+        return $this->belongsTo('DocManager\Queue\QueueElement', 'id_element', 'id_element');
     }
 }

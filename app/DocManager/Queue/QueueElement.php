@@ -25,4 +25,12 @@ class QueueElement extends Eloquent
     {
         return $this->belongsTo('DocManager\Queue\Queue', 'id_queue');
     }
+
+    /*
+        Define the one-to-many relationship
+     */
+    public function attachments()
+    {
+        return $this->hasMany('DocManager\Submission\Attachment', 'id_element', 'id_element');
+    }
 }

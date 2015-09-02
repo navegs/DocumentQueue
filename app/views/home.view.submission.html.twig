@@ -6,7 +6,6 @@
     <h1 class="page-head-line"><span class="fa fa-list"></span> {{ submission.queue.queueable.name }} {{ submission.queue.name }} Submission</h1>
     <div class="row">
         <div class="col-md-8">
-            <form class="form-horizontal" id="createSubmission" role="form" method="post" enctype="multipart/form-data" action="{{ urlFor('home.view.submission.save', {id: queue.id_queue}) }}">
                 <div class="form-group">
                     <input type="hidden" name="filetotal" id="filetotal" value="{{ queue.elements|length }}" />
                     <label class="control-label col-sm-4">Submitted By:</label>
@@ -40,22 +39,53 @@
                       {% endfor %}
                     </div>
                 </div>
+                {% if queueOwnedByThisUser %}
+                <form class="form-horizontal" id="createSubmission" role="form" method="post" enctype="multipart/form-data" action="{{ urlFor('home.view.submission.save', {id: queue.id_queue}) }}">
                 <div class="form-group">
                     <div class="col-sm-offset-7 col-sm-5">
                         <div class="btn-toolbar pull-right" role="toolbar">
-                            <a href="{{ urlFor('home') }}" role="button" class="btn btn-warning">Cancel</a>
-                            <a href="{{ urlFor('home') }}" role="button" class="btn btn-success">Save</a>
-                            {% if queueOwnedByThisUser %}
                             <a href="{{ urlFor('admin.courses') }}" role="button" class="btn btn-danger">Reject</a>
                             <button type="submit" class="btn btn-success" id="submit">Approve</button>
-                            {% endif %}
                         </div>
                     </div>                         
                 </div>
-            </form>
+                </form>
+                {% endif %}
         </div>
         <div class="col-sm-4"></div>
     </div>
+<!-- TO DO: FINISH ATTACHMENT REPLACEMENT
+    <div class="row">
+        <div class="col-sm-8">
+            <p class="page-head-line">Attachments</p>
+        </div>
+        <div class="col-sm-4"></div>
+    </div>
+    {% for a in submission.attachments %}
+    <div class="row">
+        <form class="form-horizontal" id="updateAttachment" role="form" method="post" enctype="multipart/form-data" action="{{ urlFor('submission.addcomment', {id: a.id_attachment }) }}">
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="file{{ a.id_attachment }}"><p class="form-control-static"><a href="{{ urlFor('home.view.attachment', {id: a.id_attachment}) }}" target="_blank">{{ a.element.name }}</a></label>
+                <div class="col-md-5">
+                    <input type="file" name="file{{ q_element.id_element }}" id="file{{ q_element.id_element }}" class="filestyle" data-buttonText="Replace" data-placeholder="{{ a.name }}">
+                    <span class="help-block">{{ q_element.description }}</span>
+                </div>
+                <div class="col-md-1">
+                    <p class="form-control-static"><a href="{{ urlFor('home.view.attachment', {id: a.id_attachment}) }}" target="_blank">View</a></p>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-8">
+                    <div class="btn-toolbar pull-right" role="toolbar">
+                        <button type="submit" class="btn btn-info" id="submit">Upload</button>
+                    </div>
+                </div>                         
+            </div>
+        </form>
+    </div>
+    <div class="row"><div class="col-sm-8"><hr></div><div class="col-sm-4"></div></div>
+    {% endfor %}
+-->
     <div class="row">
         <div class="col-sm-8">
             <p class="page-head-line">Comments</p>

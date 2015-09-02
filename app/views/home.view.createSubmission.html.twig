@@ -22,9 +22,9 @@
                 </div>
                 {% for q_element in queue.elements %}
                 <div class="form-group">
-                    <label class="control-label col-sm-4" for="file{{ loop.index0 }}">{{ q_element.name }}:</label>
+                    <label class="control-label col-sm-4" for="file{{ q_element.id_element }}">{{ q_element.name }}:</label>
                     <div class="col-sm-8">
-                        <input type="file" name="file{{ loop.index0 }}" id="file{{ loop.index0 }}" class="filestyle">
+                        <input type="file" name="file{{ q_element.id_element }}" id="file{{ q_element.id_element }}" class="filestyle">
                         <span class="help-block">{{ q_element.description }}</span>
                     </div>
                 </div>

@@ -28,7 +28,7 @@ $app->get('/submission/:id', $authenticated(), function ($subId) use ($app) {
     $submission = Submission::find(intval($subId));
 
     if (!empty($submission)) {
-        $submission->load('user', 'queue', 'queue.queueable', 'attachments', 'comments', 'comments.user');
+        $submission->load('user', 'queue', 'queue.queueable', 'attachments', 'attachments.element', 'comments', 'comments.user');
         $submission->comments = $submission->comments->sortBy(function ($comment) {
             return $comment->created_at;
         })->reverse();
@@ -138,12 +138,26 @@ $app->post('/submission/addcomment/:id', $authenticated(), function ($subId) use
     $comment = trim(strip_tags($request->post('comment')));
 
     if (!empty($comment) && (strlen($comment) <= 200)) {
-        $submission = Submission::find(intval($subId));
+        $submission = Submission::find(intval($subId))->load('user', 'queue', 'queue.queueable');
         $submission->comments()->save(new Comment([
                                     'comment' => $comment,
                                     'id_user' => $app->auth->id_user,
                                     'created_at' => date('Y-m-d G:i:s')
         ]));
+
+        
+        // If the user adding the comment is not the submission creator
+        // Notify submission creator of new comment
+        if ($app->auth->id_user != $submission->id_user) {
+            $app->mail->send(
+                'email/commentadded.html.twig',
+                ['user' => $app->auth, 'submission' => $submission, 'comment' => $comment],
+                function ($message) use ($submission) {
+                    $message->to($submission->user->email);
+                    $message->subject('New Comment for '.$submission->queue->name.' - '.$submission->queue->queueable->name);
+                }
+            );
+        }
     }
 
     $app->response->redirect($app->urlFor('home.view.submission', array('id' => $subId)));
@@ -199,9 +213,10 @@ $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($a
      */
     if (isset($filetotal) && ($filetotal > 0)) {
         $filetotal = intval($filetotal);
+        $attachments = array();
 
-        for ($i=0; $i<$filetotal; $i++) {
-            $file = $_FILES["file$i"];
+        foreach ($_FILES as $key => $file) {
+            $elementId = intval(substr($key, 4));
 
             // Check for file upload error and redirect with error message
             if ($file['error'] != 0) {
@@ -224,12 +239,16 @@ $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($a
                 $contenttype = $file['type'];
             }
 
-            $attachments[$i] = new Attachment([
+            array_push(
+                $attachments,
+                new Attachment([
+                                'id_element' => $elementId,
                                 'name' => $file['name'],
                                 'size' => $file['size'],
                                 'content_type' => $contenttype,
                                 'content' => base64_encode(file_get_contents($file['tmp_name']))
-            ]);
+                ])
+            );
         }
     }
 

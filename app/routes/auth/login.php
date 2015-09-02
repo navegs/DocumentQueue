@@ -5,28 +5,38 @@ $app->get('/login', $guest(), function () use ($app) {
 })->name('login');
 
 $app->post('/login', $guest(), function () use ($app) {
-
+    
     $request = $app->request;
 
-    $email = $request->post('email');
-    $password = $request->post('password');
+    $email = strip_tags(trim($request->post('email')));
+    $password = strip_tags(trim($request->post('password')));
 
-    /*
-    TODO: FORM VALIDATION
-     */
+    $v = $app->validation;
     
-    $user = $app->user->where('email', $email)->first();
+    $v->validate([
+        'email|Email' => [$email, 'required'],
+        'password|Password' => [$password, 'required'],
+    ]);
 
-    if ($user && $app->hash->passwordCheck($password, $user->password)) {
-        $_SESSION[$app->config->get('auth.session')] = $user->id_user;
+    if ($v->passes()) {
+        $user = $app->user->where('email', $email)->first();
 
-        $app->flash('global', $user->email.' is now signed in!');
+        if ($user && $app->hash->passwordCheck($password, $user->password)) {
+            $_SESSION[$app->config->get('auth.session')] = $user->id_user;
 
-        return $app->response->redirect($app->urlFor('home'));
+            $app->flash('global', $user->email.' is now signed in!');
+
+            return $app->response->redirect($app->urlFor('home'));
+        } else {
+            $app->flash('global', 'Could not log in user '.$email);
+
+            return $app->response->redirect($app->urlFor('login'));
+        }
     } else {
-        $app->flash('global', 'Could not log in user '.$email);
-
-        return $app->response->redirect($app->urlFor('login'));
+        $app->render('auth/login.html.twig', [
+                'errors' => $v->errors(),
+                'request' => $request
+            ]);
     }
 
 
