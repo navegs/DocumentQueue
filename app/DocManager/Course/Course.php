@@ -35,4 +35,16 @@ class Course extends Eloquent
     {
         return $this->morphMany('DocManager\Queue\Queue', 'queueable');
     }
+
+    // Override existing delete method to remove related models
+    public function delete()
+    {
+        // delete all associated queues
+        $this->queues->each(function ($queue) {
+            $queue->delete();
+        });
+        
+        // delete the course
+        return parent::delete();
+    }
 }

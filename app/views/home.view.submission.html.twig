@@ -39,7 +39,7 @@
                       {% endfor %}
                     </div>
                 </div>
-                {% if queueOwnedByThisUser and reviewable %}
+                {% if (queueOwnedByThisUser or auth.hasRole('ADMIN')) and reviewable %}
                 <form class="form-horizontal" id="createSubmission" role="form" method="post" action="">
                 <div class="form-group">
                     <div class="col-sm-offset-7 col-sm-5">
@@ -119,7 +119,7 @@
     {% endfor %}
 {% endblock %}
 {% block script %}
-{% if queueOwnedByThisUser and reviewable %}
+{% if (queueOwnedByThisUser or auth.hasRole('ADMIN')) and reviewable %}
 <script>
     $('#rejectBtn').click(function () {
         var url = "{{ urlFor ('submission.action') }}";

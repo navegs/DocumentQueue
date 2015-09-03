@@ -209,7 +209,7 @@ $app->post('/submission/:action/:id', $authenticated(), function ($action, $subI
     
 })->name('submission.action');
 
-$app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($app) {
+$app->post('/submissionsave/:id', $authenticated(), function ($queueId) use ($app) {
     if (!isset($queueId) || !is_numeric($queueId)) {
             $app->flash('global', 'Submission queue id invalid or not provided!');
 
@@ -236,7 +236,7 @@ $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($a
 
     $request = $app->request;
     $filetotal = strip_tags($request->post('filetotal'));
-    $comment = strip_tags($request->post('comment'));
+    $comment = strip_tags(trim($request->post('comment')));
 
     /*
         Used to check for errors and provide useful descriptions in case a file upload fails.
@@ -297,7 +297,7 @@ $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($a
         }
     }
 
-    // Update or create the submission and get reference
+    // Create the submission and get reference
     $submission = Submission::create([
         'id_user' => $app->auth->id_user,
         'id_queue' => $queue->id_queue,
@@ -305,7 +305,7 @@ $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($a
     ]);
 
     // Add comment if provided
-    if (isset($comment) and !empty(trim($comment))) {
+    if (isset($comment) and !empty($comment)) {
         $submission->comments()->save(new Comment([
                                         'comment' => $comment,
                                         'id_user' => $app->auth->id_user,
@@ -320,5 +320,5 @@ $app->post('/submission/save/:id', $authenticated(), function ($queueId) use ($a
 
     $app->flash('global', $queue->name.' Submitted');
 
-    $app->redirect($app->urlFor('home.view.queue', array('id' => $queue->id_queue)));
+    $app->response->redirect($app->urlFor('home.view.queue', array('id' => $queue->id_queue)));
 })->name('home.view.submission.save');

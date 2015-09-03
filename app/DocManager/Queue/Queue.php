@@ -46,4 +46,21 @@ class Queue extends Eloquent
     {
         return $this->hasMany('DocManager\Submission\Submission', 'id_queue', 'id_queue');
     }
+
+    // Override existing delete method to remove related models
+    public function delete()
+    {
+        // delete all associated queue elements
+        $this->elements->each(function ($element) {
+            $element->delete();
+        });
+
+        // delete all associated submissions
+        $this->submissions->each(function ($submission) {
+            $submission->delete();
+        });
+        
+        // delete the queue
+        return parent::delete();
+    }
 }

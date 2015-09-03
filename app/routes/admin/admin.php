@@ -3,6 +3,8 @@
 use DocManager\User\User;
 use DocManager\Role\Role;
 use DocManager\Course\Course;
+use DocManager\Queue\Queue;
+use DocManager\Queue\QueueElement;
 
 /*
     Routes for administrator functionality
@@ -125,7 +127,7 @@ $app->post('/admin/user/save', $authorizationCheck(['ADMIN']), function () use (
     if (!empty($userId)) {
         // User Id provided, so we are updating an existing user
         // Ensure user id is valide or redirect user
-        $user = User::where('id_user', $userId)->first();
+        $user = User::where('id_user', $userId)->first()->load('roles', 'advisor');
         
         if (empty($user)) {
             // No user was found with this id, redirect to admin users page
@@ -180,8 +182,6 @@ $app->post('/admin/user/save', $authorizationCheck(['ADMIN']), function () use (
             // Retrieve a collection of all roles
             $roles = Role::all()->toArray();
 
-            $user = User::where('id_user', $userId)->first()->load('roles', 'advisor');
-
             $app->render('admin/admin.edituser.html.twig', [
                     'errors' => $v->errors(),
                     'request' => $request,
@@ -227,7 +227,7 @@ $app->post('/admin/user/save', $authorizationCheck(['ADMIN']), function () use (
                 // Add the new roles
                 $user->roles()->attach($rolesArray);
             }
-            
+
             $app->flash('global', 'User Info Saved');
             return $app->response->redirect($app->urlFor('admin.editUser', array('id' => $user->id_user)));
         } else {
@@ -376,26 +376,26 @@ $app->post('/admin/course/delete', $authorizationCheck(['ADMIN']), function () u
     $courseIdsStr = $request->post('courseIds');
 
     if (isset($courseIdsStr) && $courseIdsStr != "") {
-        // Convert the comma delimited string of user ids into an array of ints
+        // Convert the comma delimited string of course ids into an array of ints
         $courseIds = array_map('intval', explode(",", $courseIdsStr));
 
-        // Loop through each user id
+        // Loop through each course id
         foreach ($courseIds as $courseId) {
             $course = Course::where('id_course', $courseId)->first();
                         
-            // Delete the user record
+            // Delete the course
             $course->delete();
         }
 
-        $app->flash('global', "Course(s) deleted");
+        $app->flash('global', "Course(s) and related data deleted");
     }
 
     return $app->response->redirect($app->urlFor('admin.courses'));
 })->name('admin.deleteCourse');
 
 /*
-    Route: Admin Create New User
-    Name: admin.newUser
+    Route: Admin Create New Course
+    Name: admin.newCourse
  */
 $app->get('/admin/course/new', $authorizationCheck(['ADMIN']), function () use ($app) {
     /*
@@ -418,9 +418,9 @@ $app->get('/admin/course/new', $authorizationCheck(['ADMIN']), function () use (
  */
 $app->get('/admin/course/:id', $authorizationCheck(['ADMIN']), function ($courseId) use ($app) {
     if (!isset($courseId) || !is_numeric($courseId)) {
-            $app->flash('global', 'Course Id invalid or not provided!');
+        $app->flash('global', 'Course Id invalid or not provided!');
 
-            $app->redirect($app->urlFor('admin.courses'));
+        $app->redirect($app->urlFor('admin.courses'));
     }
 
     // Retrieve the user's record
@@ -454,27 +454,108 @@ $app->post('/admin/course/save', $authorizationCheck(['ADMIN']), function () use
 
     $request = $app->request;
 
-    $courseId = $request->post('courseId');
-    $name = $request->post('name');
-    $description = $request->post('description');
-    $coordinator = $request->post('coordinator');
+    $courseId = strip_tags(trim($request->post('courseId')));
+    $name = strip_tags(trim($request->post('name')));
+    $description = strip_tags(trim($request->post('description')));
+    $coordinator = strip_tags(trim($request->post('coordinator')));
     // Get the id of the user that is adding this course
     $addedby = $app->auth->id_user;
-    $advisor = $request->post('advisor');
 
-    /*
-    TODO: Form Validation & Check for duplicate email
-     */
+    $v = $app->validation;
 
-    $course = Course::updateOrCreate([
-        'id_course' => $courseId,
-        'name' => $name,
-        'description' => $description,
-        'id_coordinator' => $coordinator,
-        'id_added_by' => $addedby
+    $v->validate([
+        'name|Name' => [$name, 'required|max(80)'],
+        'description|Description' => [$description, 'required|max(200)'],
+        'coordinator|Coordinator' => [$coordinator, 'required']
     ]);
 
-    $app->flash('global', 'Course Saved');
+    if (isset($courseId) && !empty($courseId)) {
+        // Course Id provided, so we are updating an existing course
+        // Ensure user id is valide or redirect user
+        $course = Course::where('id_course', $courseId)->first();
+        
+        if (empty($course)) {
+            // No course was found with this id, redirect to admin courses page
+            $app->flash('global', 'Invalid Course Id');
+            return $app->response->redirect($app->urlFor('admin.courses'));
+        }
 
-    return $app->response->redirect($app->urlFor('admin.courses'));
+        // Check field validation results
+        if ($v->passes()) {
+            $course->update([
+                'id_course' => $courseId,
+                'name' => $name,
+                'description' => $description,
+                'id_coordinator' => $coordinator
+            ]);
+
+            $app->flash('global', 'Course Info Saved');
+            return $app->response->redirect($app->urlFor('admin.editCourse', array('id' => $course->id_course)));
+        } else {
+            // Update User Validation Failed
+            //
+            //
+            // Retrieve a collection of users that have the 'INSTRUCTOR' role.
+            // This will be passed into the view so users can select a valid advisor when registering.
+            $coordinators = $app->user->whereHas('roles', function ($q) {
+                $q->where('name', '=', 'INSTRUCTOR');
+            })->get()->sortBy('last_name');
+
+            $app->render('admin/admin.editcourse.html.twig', [
+                    'errors' => $v->errors(),
+                    'request' => $request,
+                    'course' => $course,
+                    'coordinators' => $coordinators
+            ]);
+        }
+    } else {
+        // No course id provided, so this is a new course
+        // Create course and default queues
+        
+        // Check field validation results
+        if ($v->passes()) {
+            $course = Course::create([
+                'name' => $name,
+                'description' => $description,
+                'id_coordinator' => $coordinator,
+                'id_added_by' => $addedby
+            ]);
+
+            /*
+                Create an array of QueueElements to add to this queue
+            */
+            $elements = [new QueueElement(['name' => 'Add/Drop', 'description' => 'Add/Drop Form'])];
+
+            // Update or create the queue and get reference
+            $queue = Queue::create([
+                'name' => 'Add/Drop',
+                'description' => 'Queue for processing course add/drop requests',
+                'is_enabled' => true
+            ]);
+
+            // Associate queue with its owner
+            $course->queues()->save($queue);
+
+            // Add queue elements for the new queue
+            $queue->elements()->saveMany($elements);
+
+
+            $app->flash('global', 'Course Info Saved');
+            return $app->response->redirect($app->urlFor('admin.editCourse', array('id' => $course->id_course)));
+        } else {
+            // New course validation failed
+            //
+            // Retrieve a collection of users that have the 'INSTRUCTOR' role.
+            // This will be passed into the view so users can select a valid advisor when registering.
+            $coordinators = $app->user->whereHas('roles', function ($q) {
+                $q->where('name', '=', 'INSTRUCTOR');
+            })->get()->sortBy('last_name');
+
+            $app->render('admin/admin.newcourse.html.twig', [
+                    'errors' => $v->errors(),
+                    'request' => $request,
+                    'coordinators' => $coordinators
+            ]);
+        }
+    }
 })->name('admin.saveCourse');

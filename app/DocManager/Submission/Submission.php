@@ -57,4 +57,21 @@ class Submission extends Eloquent
     {
         return $this->hasMany('DocManager\Submission\Attachment', 'id_submission', 'id_submission');
     }
+
+    // Override existing delete method to remove related models
+    public function delete()
+    {
+        // delete all associated attachments
+        $this->attachments->each(function ($attachment) {
+            $attachment->delete();
+        });
+
+        // delete all associated comments
+        $this->comments->each(function ($comment) {
+            $comment->delete();
+        });
+        
+        // delete the submission
+        return parent::delete();
+    }
 }

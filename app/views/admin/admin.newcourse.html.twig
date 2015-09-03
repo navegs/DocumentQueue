@@ -12,33 +12,48 @@
     <div class="row">
         <div class="col-md-8">
                 <form class="form-horizontal" id="addCourseForm" role="form" method="post" action="{{ urlFor('admin.saveCourse') }}">
-                    <div class="form-group">
-                        <label class="control-label col-sm-4" style="padding-top:0px;" for="email">Name</label>
-                        <div class="col-sm-8">
-                        <input type="text" class="form-control" name="name" id="name" placeholder="Enter course name">
+                    <div class="form-group row{% if errors.first('name') %} has-error has-feedback{% endif %}">
+                        <label class="control-label col-sm-2" for="name">Name:</label>
+                        <div class="col-sm-5">
+                        <input type="text" class="form-control" name="name" id="name" placeholder="Enter course name"{% if request.post('name') %} value="{{ request.post('name') }}"{% endif %}>
+                        </div>
+                        <div class="col-sm-5">
+                            {% if errors.first('name') %}
+                            <span class="help-block">{{ errors.first('name') }}</span>
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-4" style="padding-top:0px;" for="firstname">Description</label>
-                        <div class="col-sm-8">
-                        <textarea class="form-control" rows="3" name="description" id="description" placeholder="Enter description"></textarea>
+                    <div class="form-group row{% if errors.first('description') %} has-error has-feedback{% endif %}">
+                        <label class="control-label col-sm-2" for="description">Description:</label>
+                        <div class="col-sm-5">
+                        <textarea class="form-control" rows="3" name="description" id="description" placeholder="Enter description">{% if request.post('description') %}{{ request.post('description') }}{% endif %}</textarea>
+                        </div>
+                        <div class="col-sm-5">
+                            {% if errors.first('description') %}
+                            <span class="help-block">{{ errors.first('description') }}</span>
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-4" style="padding-top:0px;" for="coordinator">Coordinator</label>
-                        <div class="col-sm-3">
+                    <div class="form-group row{% if errors.first('coordinator') %} has-error has-feedback{% endif %}">
+                        <label class="control-label col-sm-2" for="coordinator">Coordinator:</label>
+                        <div class="col-sm-5">
                         <select name="coordinator" class="form-control" id="coordinator">
                             <option value="">None</option>
                             {% for coordinator in coordinators %}
-                            <option value="{{ coordinator.id_user }}">{{ coordinator.last_name }}, {{ coordinator.first_name }}</option>
+                            <option value="{{ coordinator.id_user }}"{% if request.post('coordinator') == coordinator.id_user %} selected{% endif %}>{{ coordinator.last_name }}, {{ coordinator.first_name }}</option>
                             {% endfor %}
                         </select>
                         </div>
-                    </div>                    
+                        <div class="col-sm-5">
+                            {% if errors.first('coordinator') %}
+                            <span class="help-block">{{ errors.first('coordinator') }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
                     <div class="form-group">
-                        <div class="col-sm-offset-9 col-sm-3">
+                        <div class="col-sm-offset-4 col-sm-3">
                         <div class="btn-toolbar pull-right" role="toolbar">
-                            <a href="{{ urlFor('admin.users') }}" role="button" class="btn btn-danger">Cancel</a>
+                            <a href="{{ urlFor('admin.courses') }}" role="button" class="btn btn-danger">Cancel</a>
                             <button type="submit" class="btn btn-success" id="submit">Save</button>
                         </div>
                         </div>                         
