@@ -122,10 +122,14 @@ $app->get('/submission/create/:id', $authenticated(), function ($queueId) use ($
         return $app->response->redirect($app->urlFor('home'));
     }
 
+    $userQueues = $app->auth->queues->sortBy('name');
+    $mycourses = Course::where('id_coordinator', $app->auth->id_user)->with('queues')->get()->sortBy('name');
     $queue = Queue::with('elements', 'queueable')->find(intval($queueId));
 
     $app->render('home.view.createSubmission.html.twig', [
-        'queue' => $queue
+       'userqueues' => $userQueues,
+       'mycourses' => $mycourses,
+       'queue' => $queue
     ]);
 })->name('home.view.submission.create');
 

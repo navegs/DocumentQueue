@@ -32,7 +32,7 @@
     // Override default bootgrid properties
     $("#grid-selection").bootgrid({
         templates: {        
-            header: "<div id=\"{{'{{ctx.id}}'}}\" class=\"{{'{{css.header}}'}}\"><div class=\"row\"><div class=\"col-sm-12 actionBar\"><a href=\"{{ urlFor('home.view.submission.create', {id: queue.id_queue}) }}\" role=\"button\" class=\"btn btn-default pull-left\"><span class=\"fa fa-list\"></span> Create</a><button type=\"button\" class=\"btn btn-default pull-left\" id=\"deleteBtn\"><span class=\"fa fa-trash\"></span> Delete</button><p class=\"{{'{{css.search}}'}}\"></p><p class=\"{{'{{css.actions}}'}}\"></p></div></div></div>",
+            header: "<div id=\"{{'{{ctx.id}}'}}\" class=\"{{'{{css.header}}'}}\"><div class=\"row\"><div class=\"col-sm-12 actionBar\"><a href=\"{{ urlFor('home.view.submission.create', {id: queue.id_queue}) }}\" role=\"button\" class=\"btn btn-default pull-left\"><span class=\"fa fa-list\"></span> Create</a><p class=\"{{'{{css.search}}'}}\"></p><p class=\"{{'{{css.actions}}'}}\"></p></div></div></div>",
             paginationItem: "<li class=\"{{'{{ctx.css}}'}}\"><a href=\"{{ urlFor('admin.courses') }}{{'{{ctx.uri}}'}}\" class=\"{{'{{css.paginationButton}}'}}\">{{'{{ctx.text}}'}}</a></li>",
         },
         formatters: {
@@ -41,13 +41,6 @@
                 var url = "{{ urlFor('home.view.submission') }}";
                 return string = "<a href=\"" + url.replace(':id', row['id']) + "\">" + row[column.id] + "</a>";
             }
-        }
-    });
-
-    $('#deleteBtn').click(function () {
-        var selected = $("#grid-selection").bootgrid("getSelectedRows");
-        if(selected) {
-            post("{{ urlFor('admin.deleteCourse') }}", {courseIds: selected});
         }
     });
 </script
