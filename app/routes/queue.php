@@ -7,10 +7,17 @@ use DocManager\User\User;
 use DocManager\Submission\Submission;
 
 $app->get('/queue/add/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADVISOR']), function ($type, $id) use ($app) {
+    if ((!isset($type) || ($type != 'user' && $type != 'course')) || (!isset($id) || !intval($id))) {
+            $app->flash('global', 'Invalid Queue Type or Id!');
+
+            $app->redirect($app->urlFor('home'));
+    }
+
     $course = null;
+    $id = intval($id);
 
     if ($type == 'course') {
-        $course = Course::with('coordinator')->find(intval($id));
+        $course = Course::with('coordinator')->find($id);
 
         // Check to verify that the current user is an ADMINISTRATOR or a coordinator for the course
         // before allowing a queue to be created for this course
@@ -22,7 +29,7 @@ $app->get('/queue/add/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADV
     } elseif ($type == "user") {
         // Check to verify that the currently authenticated user is not trying to create a queue
         // for a different user
-        if (intval($id) != $app->auth->id_user) {
+        if ($id != $app->auth->id_user) {
             $app->flash('global', 'Cannot create user queues for other users!');
 
             $app->redirect($app->urlFor('home'));
@@ -41,34 +48,22 @@ $app->get('/queue/add/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADV
 })->name('addqueue');
 
 $app->post('/queue/save/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','ADVISOR']), function ($type, $id) use ($app) {
-    if (!isset($type) || !isset($id)) {
-            $app->flash('global', 'Queue Type or Id not provided!');
+    if ((!isset($type) || ($type != 'user' && $type != 'course')) || (!isset($id) || !intval($id))) {
+            $app->flash('global', 'Invalid Queue Type or Id!');
 
             $app->redirect($app->urlFor('home'));
     }
-    if ($type != 'user' && $type != 'course') {
-            $app->flash('global', 'Invalid Queue Type!');
 
-            $app->redirect($app->urlFor('home'));
-    }
+    $id = intval($id);
 
     // Get the owner model for this new Queue based on the type
     // Check to verify that the user can perform this action before we continue
     switch ($type) {
         case "user":
-            $queueowner = User::find($id);
-            // Check to verify that the currently authenticated user is not trying to create a queue
-            // for a different user
-            // User shouldn't get this far since the same check was performed by the addqueue route, but
-            // this is here for those who try to circumvent the security
-            if (intval($id) != $app->auth->id_user) {
-                $app->flash('global', 'Cannot save user queues for other users!');
-
-                $app->redirect($app->urlFor('addqueue', array('type' => $type, 'id' => $id)));
-            }
+            $queueowner = $app->auth;
             break;
         case "course":
-            $queueowner = Course::with('coordinator')->find($id);
+            $queueowner = Course::with('coordinator')->find($id)->first();
 
             // Check to verify that the current user is an ADMINISTRATOR or a coordinator for the course
             // before allowing a queue to be saved for this course
@@ -82,50 +77,61 @@ $app->post('/queue/save/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','A
             break;
     }
 
-    $request = $app->request;
+    if (empty($queueowner)) {
+        $app->flash('global', 'Queue owner does not exist! Queue creation failed!');
 
-    $id = intval($id);
-    $doctotal = strip_tags($request->post('doctotal'));
-    $courseid = strip_tags($request->post('courseid'));
-    $name = strip_tags($request->post('name'));
-    $description = strip_tags($request->post('description'));
+        $app->redirect($app->urlFor('home'));
+    }
+
+    $request = $app->request;
+    $doctotal = intval(strip_tags(trim($request->post('doctotal'))));
+    $name = strip_tags(trim($request->post('name')));
+    $description = strip_tags(trim($request->post('description')));
     $queueid = strip_tags($request->post('queueid'));
     $enabled = strip_tags($request->post('enabled'));
     $enabled = isset($enabled) ? true : false;
 
     $v = $app->validation;
 
-    $v->validate([
-        'doctotal|Document Total' => [$doctotal, 'required'],
-        'courseid|Course ID' => [$courseid, 'required'],
+    $v->addRuleMessage('doctotal', 'required', 'Queue must have at least 1 document.');
+    $v->addRuleMessage('doctotal', 'min', 'Queue must have at least 1 document.');
+
+    // Dynamically build the fields to validate based on the number
+    // of documents provided for this queue
+    $fields = [
+        'doctotal|Documents' => [$doctotal, 'required|int|min(1, number)'],
         'name|Name' => [$name, 'required|max(30)'],
-        'description|Description' => [$description, 'required|max(200)'],
-    ]);
+        'description|Description' => [$description, 'required|max(200)']
+    ];
+
+    for ($i=1; $i<=$doctotal; $i++) {
+        $field_name = "name$i";
+        $field_desc = "description$i";
+        $value_name = strip_tags(trim($request->post("name$i")));
+        $value_desc = strip_tags(trim($request->post("description$i")));
+
+        $v->addRuleMessage($field_name, 'required', "Document $i Name is required.");
+        $v->addRuleMessage($field_name, 'max', "Document $i Name 20 characters maxium.");
+        $v->addRuleMessage($field_desc, 'required', "Document $i Description is required.");
+        $v->addRuleMessage($field_desc, 'max', "Document $i Description 200 characters maxium.");
+
+        $fields[$field_name."|Name"] = [$value_name, 'required|max(20)'];
+        $fields[$field_desc."|Description"] = [$value_desc, 'required|max(200)'];
+    }
+
+
+    $v->validate($fields);
 
     if ($v->passes()) {
         //Create an array of QueueElements to add to this queue
-        if (isset($doctotal) && intval($doctotal)) {
-            $doctotal = intval($doctotal);
+        for ($i=1; $i<=$doctotal; $i++) {
+            $elementname = strip_tags(trim($request->post("name$i")));
+            $desc = strip_tags(trim($request->post("description$i")));
 
-            for ($i=0; $i<$doctotal; $i++) {
-                $elementname = strip_tags($request->post("name$i"));
-                $desc = strip_tags($request->post("description$i"));
-
-                $vAttach = $app->validation;
-
-                $vAttach->validate([
-                    'elementname|Element Name' => [$elementname, 'required'],
-                ]);
-
-                if ($vAttach->passes()) {
-                    if (!empty($elementname)) {
-                        $elements[$i] = new QueueElement([
-                                            'name' => $elementname,
-                                            'description' => $desc
-                        ]);
-                    }
-                }
-            }
+            $elements[$i] = new QueueElement([
+                                'name' => $elementname,
+                                'description' => $desc
+            ]);
         }
 
         // Update or create the queue and get reference
@@ -136,6 +142,7 @@ $app->post('/queue/save/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','A
             'is_enabled' => $enabled
         ]);
 
+        var_dump($queueowner);
         // Associate queue with its owner
         $queueowner->queues()->save($queue);
 
@@ -164,7 +171,7 @@ $app->post('/queue/save/:type/:id', $authorizationCheck(['ADMIN','INSTRUCTOR','A
 })->name('savequeue');
 
 $app->get('/queue/view/:id', $authenticated(), function ($id) use ($app) {
-    if (!is_numeric($id)) {
+    if (!isset($id) || !is_numeric($id)) {
         $app->flash('global', 'Invalid Queue Id');
 
         return $app->response->redirect($app->urlFor('home'));

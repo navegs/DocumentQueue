@@ -59,6 +59,11 @@ class User extends Eloquent
 
     public function queues()
     {
+        return $this->morphMany('DocManager\Queue\Queue', 'queueable');
+    }
+
+    public function coursequeues()
+    {
         return $this->hasManyThrough('DocManager\Queue\Queue', 'DocManager\Course\Course', 'id_coordinator', 'id_queue');
     }
 

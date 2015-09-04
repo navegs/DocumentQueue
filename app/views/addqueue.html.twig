@@ -10,24 +10,24 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <form class="form-horizontal" id="addQueueForm" role="form" method="post" action="{{ urlFor('savequeue', {type: type, id: id}) }}">
             {% if course %}
                 <input type="hidden" name="courseid" id="courseid" value="{{ course.id_course }}"/>
             {% endif %}
-                <div class="form-group">
-                    <label class="control-label col-sm-2" style="padding-top:0px;" for="enabled">Enabled</label>
+                <div class="form-group row">
+                    <label class="control-label col-sm-2" for="enabled">Enabled:</label>
                     <div class="col-sm-8">
                     <div class="checkbox">
-                        <label><input type="checkbox" name="enabled" value="1" checked=""></label>
+                        <label><input type="checkbox" id="enabled" name="enabled" value="1" checked=""></label>
                     </div>
                     <span class="help-block">Leave checked if you want to enable this queue for submissions.</span>
                 </div>
                 </div>
-                <div class="form-group{% if errors.first('name') %} has-error has-feedback{% endif %}">
-                    <label class="control-label col-sm-2" style="padding-top:0px;" for="name">Name</label>
-                    <div class="col-sm-8">
-                    <input type="text" class="form-control" name="name" id="name" placeholder="Enter queue name">
+                <div class="form-group row{% if errors.first('name') %} has-error has-feedback{% endif %}">
+                    <label class="control-label col-sm-2" for="name">Name:</label>
+                    <div class="col-sm-5">
+                    <input type="text" class="form-control" name="name" id="name" placeholder="Enter queue name"{% if request.post('name') %} value="{{ request.post('name') }}"{% endif %}>
                     <span class="help-block">e.g. Study Plan, Course Prerequisitie Approval, etc.</span>
                     </div>
                     <div class="col-sm-5">
@@ -36,17 +36,23 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-2" style="padding-top:0px;" for="description">Description</label>
-                    <div class="col-sm-8">
-                    <textarea class="form-control" rows="3" name="description" id="description" placeholder="Enter description"></textarea>
+                <div class="form-group row{% if errors.first('description') %} has-error has-feedback{% endif %}">
+                    <label class="control-label col-sm-2" for="description">Description:</label>
+                    <div class="col-sm-5">
+                    <textarea class="form-control" rows="3" name="description" id="description" placeholder="Enter description">{% if request.post('description') %}{{ request.post('description') }}{% endif %}</textarea>
                     <span class="help-block">Describe the purpose of this queue.</span>
                     </div>
+                    <div class="col-sm-5">
+                        {% if errors.first('description') %}
+                        <span class="help-block">{{ errors.first('description') }}</span>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <span class="control-label col-sm-2" style="padding-top:0px;"><b>Documents</b></span>
-                    <input class="form-control" type="hidden" id="doctotal" name="doctotal" value="0"/>
+                <div class="form-group row{% if errors.first('doctotal') %} has-error has-feedback{% endif %}">
+                    <span class="control-label col-sm-2"><b>Documents:</b></span>
+                    <input type="hidden" id="doctotal" name="doctotal"{% if request.post('doctotal') %} value="{{ request.post('doctotal') }}"{% else %} value="1"{% endif %}>
                     <div class="col-sm-10">
+                        <span class="help-block">{% if errors.first('doctotal') %}{{ errors.first('doctotal') }}<br>{% endif %}Provide name and description of documents that will be required for submissions to this queue. Minimum of 1 document required.</span>
                         <div class="row clearfix">
                             <div class="col-md-12 column">
                                 <table class="table table-bordered table-hover" id="tab_logic">
@@ -64,7 +70,17 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr id='doc0'></tr>
+                                        {% if request.post('doctotal') %}
+                                        {% for i in 1..request.post('doctotal') %}
+                                        {% set name = "name" ~ i %}
+                                        {% set desc = "description" ~ i %}
+                                        <tr id='doc{{ i }}'{% if errors.first(name) or errors.first(desc) %} class="has-error has-feedback"{% endif %}>
+                                            <td>{{ i }}</td><td><input name='name{{ i }}' type='text' placeholder='Name' class='form-control input-md'{% if request.post(name) %} value="{{ request.post(name) }}"{% endif %}>{% if errors.first(name) %}<span class="help-block">{{ errors.first(name) }}</span>{% endif %}</td>
+                                            <td><input name='description{{ i }}' type='text' placeholder='Description' class='form-control input-md'{% if request.post(desc) %} value="{{ request.post(desc) }}"{% endif %}>{% if errors.first(desc) %}<span class="help-block">{{ errors.first(desc) }}</span>{% endif %}</td></tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr id='doc1'><td>1</td><td><input name='name1' type='text' placeholder='Name' class='form-control input-md'></td><td><input name='description1' type='text' placeholder='Description' class='form-control input-md'></td></tr>
+                                        {% endif %}
                                     </tbody>
                                 </table>
                             </div>
@@ -72,7 +88,7 @@
                         <a id="add_row" class="btn btn-default pull-left">Add Document</a><a id='delete_row' class="pull-right btn btn-default">Remove Document</a>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group row">
                     <div class="col-sm-offset-9 col-sm-3">
                     <div class="btn-toolbar pull-right" role="toolbar">
                         <a href="{{ urlFor('home') }}" role="button" class="btn btn-danger">Cancel</a>
@@ -82,7 +98,7 @@
                 </div>
             </form>
         </div>
-        <div class="col-sm-4"></div>
+        <div class="col-sm-2"></div>
     </div>
 </div>
 {% endblock %}
@@ -91,18 +107,19 @@
         $(document).ready(function(){
             var i = parseInt($("#doctotal").val());
             $("#add_row").click(function(){
-                $('#doc'+i).html("<td>"+ (i+1) +"</td><td><input name='name"+i+"' type='text' placeholder='Name' class='form-control input-md'/> </td><td><input name='description"+i+"' type='text' placeholder='Description' class='form-control input-md'></td>");
-
                 $('#tab_logic').append('<tr id="doc'+(i+1)+'"></tr>');
+                $('#doc'+(i+1)).html("<td>"+ (i+1) +"</td><td><input name='name"+i+"' type='text' placeholder='Name' class='form-control input-md'/> </td><td><input name='description"+i+"' type='text' placeholder='Description' class='form-control input-md'></td>");
                 i++;
                 $("#doctotal").val(i);
+                console.log("doctotal: " + $("#doctotal").val());
             });
 
             $("#delete_row").click(function(){
-                if(i>=0){
-                    $("#doc"+(i-1)).html('');
+                if(i>1){
+                    $("#doc"+(i)).html('');
                     i--;
                     $("#doctotal").val(i);
+                    console.log("doctotal: " + $("#doctotal").val());
                 }
             });
         });
