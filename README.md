@@ -1,11 +1,17 @@
 # DocumentQueue
 
-University PHP Project. This application is intended to alleviate the amount of email and email attachment / document shuffling that is ubiquituous throughout university and school departments. Often, students are required by educational institutions to submit documentation for the purpose of waiving course requirements, study plan approvals, and many other scenarios. This documentation must then be reviewed and approved by appropriate faculty. Additionally, other use cases require a similar workflow. For example, Applications for Candidacy and Study Plans must be reviewed and approved by advisors. The purpose of the Online Document Queue application is to provide:
+University PHP/MySQL project intended to alleviate the amount of email and email attachment / document shuffling that is ubiquitous throughout university and school departments. Often, students are required by educational institutions to submit documentation for the purpose of waiving course requirements, study plan approvals, and many other scenarios. This documentation must then be reviewed and approved by appropriate faculty. Additionally, other use cases require a similar workflow. For example, Applications for Candidacy and Study Plans must be reviewed and approved by advisors. The purpose of the Online Document Queue application is to provide:
 * Faculty with the ability to create course and personal document queues
 * Faculty to define required document submissions for each queue that they own
 *	Faculty with the ability to review, approve, and update submitted documentation
 *	Students with the ability to electronically submit required documentation to queues
 
+
+## TO DO
+* Utilize composer functionality and remove all unnecessary files/modules from the git repository
+* Completion of the approval functionality
+* Cleanup UI
+* Move and document To Do items using git project issues
 
 ## Dependencies
 
